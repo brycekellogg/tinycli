@@ -89,10 +89,10 @@ void tinycli_register_sig(const char* text, int (*fun)(void), int sig) {
 /*
  *
  */
-#define TINYCLI_DEFINE(t) \
-    if (cmds[cmdIndex].sig == TINYCLI_SIG_##t) { \
-        if (argc != sizeof(#t)) return TINYCLI_ERROR_NUMARGS; \
-        return ((int(*)(TINYCLI_ARGTYPE_##t)) cmds[cmdIndex].fun)(TINYCLI_ARGS_##t); \
+#define TINYCLI_DEFINE(n,...) \
+    if (cmds[cmdIndex].sig == TINYCLI_SIG_N(n,__VA_ARGS__)) { \
+        if (argc != n+1) return TINYCLI_ERROR_NUMARGS; \
+        return ((int(*)(TINYCLI_ARGTYPE_N(n,__VA_ARGS__))) cmds[cmdIndex].fun)(TINYCLI_ARGS_N(n,__VA_ARGS__)); \
     }
 
 
