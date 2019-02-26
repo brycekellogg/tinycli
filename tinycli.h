@@ -6,7 +6,7 @@
 
 // TODO: X-macro style
 #define tinycli_register(cmd, func) _Generic((func),                                        \
-int(*)(TINYCLI_ARGTYPE_V):  tinycli_register_sig(cmd, (int(*)(void))func, TINYCLI_SIG_V),   \
+int(*)(TINYCLI_ARGTYPE_):   tinycli_register_sig(cmd, (int(*)(void))func, TINYCLI_SIG_),    \
 int(*)(TINYCLI_ARGTYPE_I):  tinycli_register_sig(cmd, (int(*)(void))func, TINYCLI_SIG_I),   \
 int(*)(TINYCLI_ARGTYPE_D):  tinycli_register_sig(cmd, (int(*)(void))func, TINYCLI_SIG_D),   \
 int(*)(TINYCLI_ARGTYPE_II): tinycli_register_sig(cmd, (int(*)(void))func, TINYCLI_SIG_II),  \

@@ -101,7 +101,7 @@ void tinycli_register_sig(const char* text, int (*fun)(void), int sig) {
  */
 #define TINYCLI_DEFINE(t) \
     if (cmds[cmdIndex].sig == TINYCLI_SIG_##t) { \
-        if (argc != TINYCLI_NUMARGS_##t + 1) return TINYCLI_ERROR_NUMARGS; \
+        if (argc != sizeof(#t)) return TINYCLI_ERROR_NUMARGS; \
         return ((int(*)(TINYCLI_ARGTYPE_##t)) cmds[cmdIndex].fun)(TINYCLI_ARGS_##t); \
     }
 int tinycli_call(int argc, char* argv[]) {
