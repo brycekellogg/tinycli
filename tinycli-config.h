@@ -1,11 +1,15 @@
+#ifndef  __TINYCLI_CONFIG_H__
+#define __TINYCLI_CONFIG_H__
 
-#define TINYCLI_SIG_     1
-#define TINYCLI_SIG_I    2
-#define TINYCLI_SIG_D    3
-#define TINYCLI_SIG_II   4
-#define TINYCLI_SIG_ID   5
-#define TINYCLI_SIG_DI   6
-#define TINYCLI_SIG_DD   7
+/*
+ *
+ */
+#define TINYCLI_DEFINE(t) TINYCLI_SIG_##t,
+enum {
+#include "tinycli-funs.h"
+};
+#undef TINYCLI_DEFINE
+
 
 #define TINYCLI_ARGTYPE_    void
 #define TINYCLI_ARGTYPE_I   int
@@ -34,4 +38,4 @@
     #error "MAX_ARGC must be at least 1"
 #endif
 
-
+#endif // __TINYCLI_CONFIG_H__

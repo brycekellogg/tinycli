@@ -86,6 +86,15 @@ void tinycli_register_sig(const char* text, int (*fun)(void), int sig) {
     numCmds++;
 }
 
+/*
+ *
+ */
+#define TINYCLI_DEFINE(t) \
+    if (cmds[cmdIndex].sig == TINYCLI_SIG_##t) { \
+        if (argc != sizeof(#t)) return TINYCLI_ERROR_NUMARGS; \
+        return ((int(*)(TINYCLI_ARGTYPE_##t)) cmds[cmdIndex].fun)(TINYCLI_ARGS_##t); \
+    }
+
 
 /* Call a registered callback based on the entered text
  *
@@ -99,11 +108,6 @@ void tinycli_register_sig(const char* text, int (*fun)(void), int sig) {
  *          error code if the given command is not found
  *          or if the arguments converted incorrectedly.
  */
-#define TINYCLI_DEFINE(t) \
-    if (cmds[cmdIndex].sig == TINYCLI_SIG_##t) { \
-        if (argc != sizeof(#t)) return TINYCLI_ERROR_NUMARGS; \
-        return ((int(*)(TINYCLI_ARGTYPE_##t)) cmds[cmdIndex].fun)(TINYCLI_ARGS_##t); \
-    }
 int tinycli_call(int argc, char* argv[]) {
     
     // Get command index
