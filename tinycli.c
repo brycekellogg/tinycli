@@ -4,17 +4,6 @@
 #include "tinycli.h"
 #include "tinycli-config.h"
 
-#define TINYCLI_CALL_FUN(t) \
-if (cmds[cmdIndex].sig == TINYCLI_SIG_##t) { \
-    if (argc != TINYCLI_NUMARGS_##t + 1) return TINYCLI_ERROR_NUMARGS; \
-    return ((int(*)(TINYCLI_ARGTYPE_##t)) cmds[cmdIndex].fun)(TINYCLI_ARGS_##t); \
-}
-
-/*
-    //#define TINYCLI_DEFINE_FUNTYPE(sig, numargs, cast)              \
-    //#include "tinycli-config.h"
-    //#undef TINYCLI_DEFINE_FUNTYPE
-*/
 
 int tinycli_stoi(const char* c) {
     return strtol(c, NULL, 0);
@@ -110,22 +99,21 @@ void tinycli_register_sig(const char* text, int (*fun)(void), int sig) {
  *          error code if the given command is not found
  *          or if the arguments converted incorrectedly.
  */
+#define TINYCLI_DEFINE(t) \
+    if (cmds[cmdIndex].sig == TINYCLI_SIG_##t) { \
+        if (argc != TINYCLI_NUMARGS_##t + 1) return TINYCLI_ERROR_NUMARGS; \
+        return ((int(*)(TINYCLI_ARGTYPE_##t)) cmds[cmdIndex].fun)(TINYCLI_ARGS_##t); \
+    }
 int tinycli_call(int argc, char* argv[]) {
     
     // Get command index
     int cmdIndex = findCmd(argc, argv);
     if (cmdIndex < 0) return TINYCLI_ERROR_NOCMD;
 
-    // Try calling functions
-    TINYCLI_CALL_FUN(V);
-    TINYCLI_CALL_FUN(I);
-    TINYCLI_CALL_FUN(D);
-    TINYCLI_CALL_FUN(II);
-    TINYCLI_CALL_FUN(ID);
-    TINYCLI_CALL_FUN(DI);
-    TINYCLI_CALL_FUN(DD);
+    #include "tinycli-funs.h"
     return TINYCLI_ERROR_NOSIG;
 }
+#undef TINYCLI_DEFINE
 
 
 

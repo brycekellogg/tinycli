@@ -1,13 +1,5 @@
 #include "tinycli-config.h"
 
-#define TINYCLI_FUN_V
-#define TINYCLI_FUN_I
-#define TINYCLI_FUN_D
-#define TINYCLI_FUN_II
-#define TINYCLI_FUN_DD
-#define TINYCLI_FUN_ID
-#define TINYCLI_FUN_DI
-
 #define TINYCLI_ERROR_NOCMD     -1
 #define TINYCLI_ERROR_NUMARGS   -2
 #define TINYCLI_ERROR_NOSIG     -3
