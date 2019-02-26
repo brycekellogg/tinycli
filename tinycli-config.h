@@ -19,13 +19,15 @@ enum {
 #define TINYCLI_ARGTYPE_DI  double,int
 #define TINYCLI_ARGTYPE_DD  double,double
 
+#define TINYCLI_ARGS(t, i) tinycli_sto##t(argv[i])
+
 #define TINYCLI_ARGS_
-#define TINYCLI_ARGS_I   tinycli_stoi(argv[1])
-#define TINYCLI_ARGS_D   tinycli_stod(argv[1])
-#define TINYCLI_ARGS_II  tinycli_stoi(argv[1]), tinycli_stoi(argv[2])
-#define TINYCLI_ARGS_ID  tinycli_stoi(argv[1]), tinycli_stod(argv[2])
-#define TINYCLI_ARGS_DI  tinycli_stod(argv[1]), tinycli_stoi(argv[2])
-#define TINYCLI_ARGS_DD  tinycli_stod(argv[1]), tinycli_stod(argv[2])
+#define TINYCLI_ARGS_I   TINYCLI_ARGS(I, 1)
+#define TINYCLI_ARGS_D   TINYCLI_ARGS(D, 1)
+#define TINYCLI_ARGS_II  TINYCLI_ARGS(I, 1),TINYCLI_ARGS(I, 2)
+#define TINYCLI_ARGS_ID  TINYCLI_ARGS(I, 1),TINYCLI_ARGS(D, 2)
+#define TINYCLI_ARGS_DI  TINYCLI_ARGS(D, 1),TINYCLI_ARGS(I, 2)
+#define TINYCLI_ARGS_DD  TINYCLI_ARGS(D, 1),TINYCLI_ARGS(D, 2)
 
 #define TINYCLI_MAXCMDS    14
 #define TINYCLI_MAXARGC    14

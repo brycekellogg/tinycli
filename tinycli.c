@@ -5,11 +5,11 @@
 #include "tinycli-config.h"
 
 
-int tinycli_stoi(const char* c) {
+int tinycli_stoI(const char* c) {
     return strtol(c, NULL, 0);
 }
 
-double tinycli_stod(const char* c) {
+double tinycli_stoD(const char* c) {
     return strtod(c, NULL);
 }
 
