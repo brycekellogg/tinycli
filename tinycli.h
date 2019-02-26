@@ -8,27 +8,24 @@
 #define TINYCLI_FUN_ID
 #define TINYCLI_FUN_DI
 
-#define TINYCLI_SIG_V    1
-#define TINYCLI_SIG_I    2
-#define TINYCLI_SIG_D    3
-#define TINYCLI_SIG_II   4
-#define TINYCLI_SIG_ID   5
-#define TINYCLI_SIG_DI   6
-#define TINYCLI_SIG_DD   7
-
-
 #define TINYCLI_ERROR_NOCMD     -1
 #define TINYCLI_ERROR_NUMARGS   -2
 #define TINYCLI_ERROR_NOSIG     -3
 
-#define tinycli_register(cmd, func) _Generic((func),   \
-int(*)(void):       tinycli_register_sig(cmd, (int(*)(void))func, TINYCLI_SIG_V),   \
-int(*)(int):        tinycli_register_sig(cmd, (int(*)(void))func, TINYCLI_SIG_I),   \
-int(*)(double):     tinycli_register_sig(cmd, (int(*)(void))func, TINYCLI_SIG_D),   \
-int(*)(int,int):    tinycli_register_sig(cmd, (int(*)(void))func, TINYCLI_SIG_II),  \
-int(*)(int,double): tinycli_register_sig(cmd, (int(*)(void))func, TINYCLI_SIG_ID),  \
-int(*)(double,int): tinycli_register_sig(cmd, (int(*)(void))func, TINYCLI_SIG_DI)   )
+// TODO: X-macro style
+#define tinycli_register(cmd, func) _Generic((func),                                        \
+int(*)(TINYCLI_ARGTYPE_V):  tinycli_register_sig(cmd, (int(*)(void))func, TINYCLI_SIG_V),   \
+int(*)(TINYCLI_ARGTYPE_I):  tinycli_register_sig(cmd, (int(*)(void))func, TINYCLI_SIG_I),   \
+int(*)(TINYCLI_ARGTYPE_D):  tinycli_register_sig(cmd, (int(*)(void))func, TINYCLI_SIG_D),   \
+int(*)(TINYCLI_ARGTYPE_II): tinycli_register_sig(cmd, (int(*)(void))func, TINYCLI_SIG_II),  \
+int(*)(TINYCLI_ARGTYPE_ID): tinycli_register_sig(cmd, (int(*)(void))func, TINYCLI_SIG_ID),  \
+int(*)(TINYCLI_ARGTYPE_DI): tinycli_register_sig(cmd, (int(*)(void))func, TINYCLI_SIG_DI),  \
+int(*)(TINYCLI_ARGTYPE_DD): tinycli_register_sig(cmd, (int(*)(void))func, TINYCLI_SIG_DD)   )
 
+// TODO: non-gneric helper functions
+// tinycli_register_v(.....)
+// tinycli_register_ii(.....)
+// etc
 
 
 

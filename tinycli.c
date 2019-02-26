@@ -4,62 +4,16 @@
 #include "tinycli.h"
 #include "tinycli-config.h"
 
+#define TINYCLI_CALL_FUN(t) \
+if (cmds[cmdIndex].sig == TINYCLI_SIG_##t) { \
+    if (argc != TINYCLI_NUMARGS_##t + 1) return TINYCLI_ERROR_NUMARGS; \
+    return ((int(*)(TINYCLI_ARGTYPE_##t)) cmds[cmdIndex].fun)(TINYCLI_ARGS_##t); \
+}
 
-
-#define TINYCLI_TYPE_i  int
-#define TINYCLI_TYPE_u  unsigned
-#define TINYCLI_TYPE_l  long
-#define TINYCLI_TYPE_ul unsigned long
-#define TINYCLI_TYPE_d  double
-
-#define TINYCLI_CAST_V   int(*)(void)
-#define TINYCLI_CAST_I   int(*)(int)
-#define TINYCLI_CAST_D   int(*)(double)
-#define TINYCLI_CAST_II  int(*)(int,int)
-#define TINYCLI_CAST_ID  int(*)(int,double)
-#define TINYCLI_CAST_DI  int(*)(double,int)
-#define TINYCLI_CAST_DD  int(*)(double,double)
-
-#define TINYCLI_NUMARGS_V  0
-#define TINYCLI_NUMARGS_I  1
-#define TINYCLI_NUMARGS_D  1
-#define TINYCLI_NUMARGS_II 2
-#define TINYCLI_NUMARGS_ID 2
-#define TINYCLI_NUMARGS_DI 2
-#define TINYCLI_NUMARGS_DD 2
-
-#define TINYCLI_ARGS_V
-#define TINYCLI_ARGS_I   arg0
-#define TINYCLI_ARGS_D   arg0
-#define TINYCLI_ARGS_II  arg0,arg1
-#define TINYCLI_ARGS_ID  arg0,arg1
-#define TINYCLI_ARGS_DI  arg0,arg1
-#define TINYCLI_ARGS_DD  arg0,arg1
-
-#define TINYCLI_CONVERTARGS_V
-#define TINYCLI_CONVERTARGS_I  int    arg0 = strtol();
-#define TINYCLI_CONVERTARGS_D  double arg0 = strtod();
-#define TINYCLI_CONVERTARGS_II tinycli_arg(0,l); tinycli_arg(1,l);
-#define TINYCLI_CONVERTARGS_ID tinycli_arg(0,l); tinycli_arg(1,d);
-#define TINYCLI_CONVERTARGS_DI tinycli_arg(0,d); tinycli_arg(1,l);
-#define TINYCLI_CONVERTARGS_DD tinycli_arg(0,d); tinycli_arg(1,d);
-
-
-#define tinycli_arg(i, t) TINYCLI_TYPE_##t arg##i = strto##t(argv[i+1], NULL, 0)
 /*
-
     //#define TINYCLI_DEFINE_FUNTYPE(sig, numargs, cast)              \
-    //if (cmds[cmdIndex].sig == sig) {                                \
-        //if (argc != numargs + 1) return TINYCLI_ERROR_NUMARGS;      \
-        //for (i = 1; i < numargs+1; i++) { \
-            //??? \
-        //} \
-        //TINYCLI_CONVERTARGS_##type                                  \
-        //return ((cast) cmds[cmdIndex].fun)(TINYCLI_ARGS(numargs));  \
-    //}
     //#include "tinycli-config.h"
     //#undef TINYCLI_DEFINE_FUNTYPE
-
 */
 
 int tinycli_stoi(const char* c) {
@@ -162,59 +116,14 @@ int tinycli_call(int argc, char* argv[]) {
     int cmdIndex = findCmd(argc, argv);
     if (cmdIndex < 0) return TINYCLI_ERROR_NOCMD;
 
-
-    // (void)
-    if (cmds[cmdIndex].sig == TINYCLI_SIG_V) {
-        if (argc != TINYCLI_NUMARGS_V + 1) return TINYCLI_ERROR_NUMARGS;
-        return ((int(*)(void)) cmds[cmdIndex].fun)();
-    }
-
-    // (int)
-    if (cmds[cmdIndex].sig == TINYCLI_SIG_I) {
-        if (argc != TINYCLI_NUMARGS_I + 1) return TINYCLI_ERROR_NUMARGS;
-        int arg0 = tinycli_stoi(argv[1]);
-        return ((int(*)(int)) cmds[cmdIndex].fun)(arg0);
-    }
-    
-    // (double)
-    if (cmds[cmdIndex].sig == TINYCLI_SIG_D) {
-        if (argc != TINYCLI_NUMARGS_D + 1) return TINYCLI_ERROR_NUMARGS;
-        double arg0 = tinycli_stod(argv[1]);
-        return ((int(*)(double)) cmds[cmdIndex].fun)(arg0);
-    }
-    
-    // (int,int)
-    if (cmds[cmdIndex].sig == TINYCLI_SIG_II) {
-        if (argc != TINYCLI_NUMARGS_II + 1) return TINYCLI_ERROR_NUMARGS;
-        int arg0 = tinycli_stoi(argv[1]);
-        int arg1 = tinycli_stoi(argv[2]);
-        return ((int(*)(int,int)) cmds[cmdIndex].fun)(arg0,arg1);
-    }
-    
-    // (int,double)
-    if (cmds[cmdIndex].sig == TINYCLI_SIG_ID) {
-        if (argc != TINYCLI_NUMARGS_ID + 1) return TINYCLI_ERROR_NUMARGS;
-        int    arg0 = tinycli_stoi(argv[1]);
-        double arg1 = tinycli_stod(argv[2]);
-        return ((int(*)(int,double)) cmds[cmdIndex].fun)(arg0,arg1);
-    }
-    
-    // (double,int)
-    if (cmds[cmdIndex].sig == TINYCLI_SIG_DI) {
-        if (argc != TINYCLI_NUMARGS_DI + 1) return TINYCLI_ERROR_NUMARGS;
-        double arg0 = tinycli_stod(argv[1]);
-        int    arg1 = tinycli_stoi(argv[2]);
-        return ((int(*)(double,int)) cmds[cmdIndex].fun)(arg0,arg1);
-    }
-    
-    // (double,double)
-    if (cmds[cmdIndex].sig == TINYCLI_SIG_DD) {
-        if (argc != TINYCLI_NUMARGS_DD + 1) return TINYCLI_ERROR_NUMARGS;
-        double arg0 = tinycli_stod(argv[1]);
-        double arg1 = tinycli_stod(argv[2]);
-        return ((int(*)(double,double)) cmds[cmdIndex].fun)(arg0,arg1);
-    }
-    
+    // Try calling functions
+    TINYCLI_CALL_FUN(V);
+    TINYCLI_CALL_FUN(I);
+    TINYCLI_CALL_FUN(D);
+    TINYCLI_CALL_FUN(II);
+    TINYCLI_CALL_FUN(ID);
+    TINYCLI_CALL_FUN(DI);
+    TINYCLI_CALL_FUN(DD);
     return TINYCLI_ERROR_NOSIG;
 }
 

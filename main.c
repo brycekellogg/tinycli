@@ -40,12 +40,11 @@ int f_di(double arg0, int arg1) {
     return 6;
 }
 
-int f_dd(int arg0, int arg1) {
+int f_dd(double arg0, double arg1) {
     check_d0 = arg0;
     check_d1 = arg1;
     return 7;
 }
-
 
 int main() {
     int res;
