@@ -10,16 +10,15 @@
 #define TINYCLI_ERROR_NOSIG     -3
 
 int  tinycli_process(void);
-void tinycli_putc(char c);
-void tinycli_puts(char* str);
+void tinycli_putsn(char* s, int n);
 
-void tinycli_register_v (const char* cmd, int (*f)(void));
-void tinycli_register_i (const char* cmd, int (*f)(int));
-void tinycli_register_d (const char* cmd, int (*f)(double));
-void tinycli_register_ii(const char* cmd, int (*f)(int,int));
-void tinycli_register_id(const char* cmd, int (*f)(int,double));
-void tinycli_register_di(const char* cmd, int (*f)(double,int));
-void tinycli_register_dd(const char* cmd, int (*f)(double,double));
+void tinycli_register_v  (const char* cmd, int (*f)(void));
+void tinycli_register_i  (const char* cmd, int (*f)(int));
+void tinycli_register_d  (const char* cmd, int (*f)(double));
+void tinycli_register_ii (const char* cmd, int (*f)(int,int));
+void tinycli_register_id (const char* cmd, int (*f)(int,double));
+void tinycli_register_di (const char* cmd, int (*f)(double,int));
+void tinycli_register_dd (const char* cmd, int (*f)(double,double));
 
 #define tinycli_register(cmd, func) _Generic((func),  \
     int(*)(void):          tinycli_register_v,        \

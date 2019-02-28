@@ -49,7 +49,7 @@ static int numCmds = 0;
  */
 int tokenize(char* str, char* argv[]) {
     int argc = 0;
-    argv[argc] = strtok(str, " ");
+    argv[argc] = strtok(str, " \n");
     while (++argc < TINYCLI_MAXARGC && (argv[argc] = strtok(NULL, " ")));
     return argc;
 }
@@ -87,16 +87,7 @@ void tinycli_register_sig(const char* text, int (*fun)(void), int sig, int nargs
     numCmds++;
 }
 
-enum {
-    v,
-    i,
-    d,
-    ii,
-    id,
-    di,
-    dd,
-};
-
+enum {v,i,d,ii,id,di,dd,};
 void tinycli_register_v (const char* cmd, int (*f)(void))           { tinycli_register_sig(cmd, (int(*)(void)) f, v,  0); }
 void tinycli_register_i (const char* cmd, int (*f)(int))            { tinycli_register_sig(cmd, (int(*)(void)) f, i,  1); }
 void tinycli_register_d (const char* cmd, int (*f)(double))         { tinycli_register_sig(cmd, (int(*)(void)) f, d,  1); }
@@ -140,27 +131,23 @@ int tinycli_call(int argc, char* argv[]) {
 
 
 
+static char buffer[TINYCLI_MAXBUFFER];
+static int  top = 0;
 
-char tinycli_buffer[TINYCLI_MAXBUFFER];
-
-
-void tinycli_puts(char* str) {
-    strcpy(tinycli_buffer, str);
+void tinycli_putsn(char* s, int n) {
+    for (int i = 0; i < n; i++) {
+        buffer[top++] = s[i];
+        if (s[i] == '\n') tinycli_process();
+    }
 }
 
-void tinycli_putsn(char* str, int n) {
-
-}
-
-void tinycli_putc(char c) {
-}
 
 int tinycli_process() {
-    // TODO: look for newlines
-    
+    top = 0;
+   
     // Parse command
     char* argv[TINYCLI_MAXARGC];
-    int argc = tokenize(tinycli_buffer, argv);
+    int argc = tokenize(buffer, argv);
 
     // Call resulting function
     return tinycli_call(argc, argv);
