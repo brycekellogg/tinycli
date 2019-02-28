@@ -2,14 +2,22 @@
 #include <string.h>
 
 #include "tinycli.h"
-#include "tinycli-config.h"
 
+enum {
+    v,
+    i,
+    d,
+    ii,
+    id,
+    di,
+    dd,
+};
 
-int tinycli_stoI(const char* c) {
+int tinycli_stoi(const char* c) {
     return strtol(c, NULL, 0);
 }
 
-double tinycli_stoD(const char* c) {
+double tinycli_stod(const char* c) {
     return strtod(c, NULL);
 }
 
@@ -21,6 +29,7 @@ static struct {
     const char* text;
     int(*fun)(void);
     int sig;
+    int nargs;
 } cmds[TINYCLI_MAXCMDS];
 
 
@@ -78,23 +87,22 @@ static int findCmd(int argc, char* argv[]) {
  *    sig  = the true signature of the callback function as defined in
  *           the TINYCLI_SIG_?? macros.
  */
-void tinycli_register_sig(const char* text, int (*fun)(void), int sig) {
+void tinycli_register_sig(const char* text, int (*fun)(void), int sig, int nargs) {
     if (numCmds >= TINYCLI_MAXCMDS) return;
-    cmds[numCmds].text = text;
-    cmds[numCmds].fun  = fun;
-    cmds[numCmds].sig  = sig;
+    cmds[numCmds].text  = text;
+    cmds[numCmds].fun   = fun;
+    cmds[numCmds].sig   = sig;
+    cmds[numCmds].nargs = nargs;
     numCmds++;
 }
 
-/*
- *
- */
-#define TINYCLI_DEFINE(n,...) \
-    if (cmds[cmdIndex].sig == TINYCLI_SIG_N(n,__VA_ARGS__)) { \
-        if (argc != n+1) return TINYCLI_ERROR_NUMARGS; \
-        return ((int(*)(TINYCLI_ARGTYPE_N(n,__VA_ARGS__))) cmds[cmdIndex].fun)(TINYCLI_ARGS_N(n,__VA_ARGS__)); \
-    }
-
+void tinycli_register_v (const char* cmd, int (*f)(void))           { tinycli_register_sig(cmd, (int(*)(void)) f, v,  0); }
+void tinycli_register_i (const char* cmd, int (*f)(int))            { tinycli_register_sig(cmd, (int(*)(void)) f, i,  1); }
+void tinycli_register_d (const char* cmd, int (*f)(double))         { tinycli_register_sig(cmd, (int(*)(void)) f, d,  1); }
+void tinycli_register_ii(const char* cmd, int (*f)(int,int))        { tinycli_register_sig(cmd, (int(*)(void)) f, ii, 2); }
+void tinycli_register_id(const char* cmd, int (*f)(int,double))     { tinycli_register_sig(cmd, (int(*)(void)) f, id, 2); }
+void tinycli_register_di(const char* cmd, int (*f)(double,int))     { tinycli_register_sig(cmd, (int(*)(void)) f, di, 2); }
+void tinycli_register_dd(const char* cmd, int (*f)(double,double))  { tinycli_register_sig(cmd, (int(*)(void)) f, dd, 2); }
 
 /* Call a registered callback based on the entered text
  *
@@ -113,11 +121,19 @@ int tinycli_call(int argc, char* argv[]) {
     // Get command index
     int cmdIndex = findCmd(argc, argv);
     if (cmdIndex < 0) return TINYCLI_ERROR_NOCMD;
+    if (argc != cmds[cmdIndex].nargs+1) return TINYCLI_ERROR_NUMARGS;
 
-    #include "tinycli-funs.h"
+    switch (cmds[cmdIndex].sig) {
+        case v:  return ((int(*)(void))          cmds[cmdIndex].fun)();
+        case i:  return ((int(*)(int))           cmds[cmdIndex].fun)(tinycli_stoi(argv[1]));
+        case d:  return ((int(*)(double))        cmds[cmdIndex].fun)(tinycli_stod(argv[1]));
+        case ii: return ((int(*)(int,int))       cmds[cmdIndex].fun)(tinycli_stoi(argv[1]),tinycli_stoi(argv[2]));
+        case id: return ((int(*)(int,double))    cmds[cmdIndex].fun)(tinycli_stoi(argv[1]),tinycli_stod(argv[2]));
+        case di: return ((int(*)(double,int))    cmds[cmdIndex].fun)(tinycli_stod(argv[1]),tinycli_stoi(argv[2]));
+        case dd: return ((int(*)(double,double)) cmds[cmdIndex].fun)(tinycli_stod(argv[1]),tinycli_stod(argv[2]));
+    }
     return TINYCLI_ERROR_NOSIG;
 }
-#undef TINYCLI_DEFINE
 
 
 
