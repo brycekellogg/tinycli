@@ -9,7 +9,6 @@
 #define TINYCLI_ERROR_NUMARGS   -2
 #define TINYCLI_ERROR_NOSIG     -3
 
-int  tinycli_call(int argc, char* argv[]);
 int  tinycli_process(void);
 void tinycli_putc(char c);
 void tinycli_puts(char* str);

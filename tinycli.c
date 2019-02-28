@@ -3,15 +3,6 @@
 
 #include "tinycli.h"
 
-enum {
-    v,
-    i,
-    d,
-    ii,
-    id,
-    di,
-    dd,
-};
 
 int tinycli_stoi(const char* c) {
     return strtol(c, NULL, 0);
@@ -96,6 +87,16 @@ void tinycli_register_sig(const char* text, int (*fun)(void), int sig, int nargs
     numCmds++;
 }
 
+enum {
+    v,
+    i,
+    d,
+    ii,
+    id,
+    di,
+    dd,
+};
+
 void tinycli_register_v (const char* cmd, int (*f)(void))           { tinycli_register_sig(cmd, (int(*)(void)) f, v,  0); }
 void tinycli_register_i (const char* cmd, int (*f)(int))            { tinycli_register_sig(cmd, (int(*)(void)) f, i,  1); }
 void tinycli_register_d (const char* cmd, int (*f)(double))         { tinycli_register_sig(cmd, (int(*)(void)) f, d,  1); }
@@ -103,6 +104,7 @@ void tinycli_register_ii(const char* cmd, int (*f)(int,int))        { tinycli_re
 void tinycli_register_id(const char* cmd, int (*f)(int,double))     { tinycli_register_sig(cmd, (int(*)(void)) f, id, 2); }
 void tinycli_register_di(const char* cmd, int (*f)(double,int))     { tinycli_register_sig(cmd, (int(*)(void)) f, di, 2); }
 void tinycli_register_dd(const char* cmd, int (*f)(double,double))  { tinycli_register_sig(cmd, (int(*)(void)) f, dd, 2); }
+
 
 /* Call a registered callback based on the entered text
  *
@@ -154,9 +156,6 @@ void tinycli_putc(char c) {
 }
 
 int tinycli_process() {
-    // Debug
-    //strcpy(tinycli_buffer, "ii 0x43 1");
-
     // TODO: look for newlines
     
     // Parse command
@@ -166,5 +165,5 @@ int tinycli_process() {
     // Call resulting function
     return tinycli_call(argc, argv);
 }
-    
+
 
