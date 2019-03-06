@@ -87,14 +87,15 @@ void tinycli_register_sig(const char* text, int (*fun)(void), int sig, int nargs
     numCmds++;
 }
 
-enum {v,i,d,ii,id,di,dd,};
-void tinycli_register_v (const char* cmd, int (*f)(void))           { tinycli_register_sig(cmd, (int(*)(void)) f, v,  0); }
-void tinycli_register_i (const char* cmd, int (*f)(int))            { tinycli_register_sig(cmd, (int(*)(void)) f, i,  1); }
-void tinycli_register_d (const char* cmd, int (*f)(double))         { tinycli_register_sig(cmd, (int(*)(void)) f, d,  1); }
-void tinycli_register_ii(const char* cmd, int (*f)(int,int))        { tinycli_register_sig(cmd, (int(*)(void)) f, ii, 2); }
-void tinycli_register_id(const char* cmd, int (*f)(int,double))     { tinycli_register_sig(cmd, (int(*)(void)) f, id, 2); }
-void tinycli_register_di(const char* cmd, int (*f)(double,int))     { tinycli_register_sig(cmd, (int(*)(void)) f, di, 2); }
-void tinycli_register_dd(const char* cmd, int (*f)(double,double))  { tinycli_register_sig(cmd, (int(*)(void)) f, dd, 2); }
+enum {v,i,d,ii,id,di,dd,dii};
+void tinycli_register_v  (const char* cmd, int (*f)(void))           { tinycli_register_sig(cmd, (int(*)(void)) f, v,   0); }
+void tinycli_register_i  (const char* cmd, int (*f)(int))            { tinycli_register_sig(cmd, (int(*)(void)) f, i,   1); }
+void tinycli_register_d  (const char* cmd, int (*f)(double))         { tinycli_register_sig(cmd, (int(*)(void)) f, d,   1); }
+void tinycli_register_ii (const char* cmd, int (*f)(int,int))        { tinycli_register_sig(cmd, (int(*)(void)) f, ii,  2); }
+void tinycli_register_id (const char* cmd, int (*f)(int,double))     { tinycli_register_sig(cmd, (int(*)(void)) f, id,  2); }
+void tinycli_register_di (const char* cmd, int (*f)(double,int))     { tinycli_register_sig(cmd, (int(*)(void)) f, di,  2); }
+void tinycli_register_dd (const char* cmd, int (*f)(double,double))  { tinycli_register_sig(cmd, (int(*)(void)) f, dd,  2); }
+void tinycli_register_dii(const char* cmd, int (*f)(double,int,int)) { tinycli_register_sig(cmd, (int(*)(void)) f, dii, 3); }
 
 
 /* Call a registered callback based on the entered text
@@ -117,13 +118,14 @@ int tinycli_call(int argc, char* argv[]) {
     if (argc != cmds[cmdIndex].nargs+1) return TINYCLI_ERROR_NUMARGS;
 
     switch (cmds[cmdIndex].sig) {
-        case v:  return ((int(*)(void))          cmds[cmdIndex].fun)();
-        case i:  return ((int(*)(int))           cmds[cmdIndex].fun)(tinycli_stoi(argv[1]));
-        case d:  return ((int(*)(double))        cmds[cmdIndex].fun)(tinycli_stod(argv[1]));
-        case ii: return ((int(*)(int,int))       cmds[cmdIndex].fun)(tinycli_stoi(argv[1]),tinycli_stoi(argv[2]));
-        case id: return ((int(*)(int,double))    cmds[cmdIndex].fun)(tinycli_stoi(argv[1]),tinycli_stod(argv[2]));
-        case di: return ((int(*)(double,int))    cmds[cmdIndex].fun)(tinycli_stod(argv[1]),tinycli_stoi(argv[2]));
-        case dd: return ((int(*)(double,double)) cmds[cmdIndex].fun)(tinycli_stod(argv[1]),tinycli_stod(argv[2]));
+        case v:   return ((int(*)(void))           cmds[cmdIndex].fun)();
+        case i:   return ((int(*)(int))            cmds[cmdIndex].fun)(tinycli_stoi(argv[1]));
+        case d:   return ((int(*)(double))         cmds[cmdIndex].fun)(tinycli_stod(argv[1]));
+        case ii:  return ((int(*)(int,int))        cmds[cmdIndex].fun)(tinycli_stoi(argv[1]),tinycli_stoi(argv[2]));
+        case id:  return ((int(*)(int,double))     cmds[cmdIndex].fun)(tinycli_stoi(argv[1]),tinycli_stod(argv[2]));
+        case di:  return ((int(*)(double,int))     cmds[cmdIndex].fun)(tinycli_stod(argv[1]),tinycli_stoi(argv[2]));
+        case dd:  return ((int(*)(double,double))  cmds[cmdIndex].fun)(tinycli_stod(argv[1]),tinycli_stod(argv[2]));
+        case dii: return ((int(*)(double,int,int)) cmds[cmdIndex].fun)(tinycli_stod(argv[1]),tinycli_stoi(argv[2]),tinycli_stoi(argv[3]));
     }
     return TINYCLI_ERROR_NOSIG;
 }

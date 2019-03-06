@@ -12,21 +12,23 @@
 int  tinycli_process(void);
 void tinycli_putsn(char* s, int n);
 
-void tinycli_register_v  (const char* cmd, int (*f)(void));
-void tinycli_register_i  (const char* cmd, int (*f)(int));
-void tinycli_register_d  (const char* cmd, int (*f)(double));
-void tinycli_register_ii (const char* cmd, int (*f)(int,int));
-void tinycli_register_id (const char* cmd, int (*f)(int,double));
-void tinycli_register_di (const char* cmd, int (*f)(double,int));
-void tinycli_register_dd (const char* cmd, int (*f)(double,double));
+void tinycli_register_v   (const char* cmd, int (*f)(void));
+void tinycli_register_i   (const char* cmd, int (*f)(int));
+void tinycli_register_d   (const char* cmd, int (*f)(double));
+void tinycli_register_ii  (const char* cmd, int (*f)(int,int));
+void tinycli_register_id  (const char* cmd, int (*f)(int,double));
+void tinycli_register_di  (const char* cmd, int (*f)(double,int));
+void tinycli_register_dd  (const char* cmd, int (*f)(double,double));
+void tinycli_register_dii (const char* cmd, int (*f)(double,int,int));
 
 #define tinycli_register(cmd, func) _Generic((func),  \
-    int(*)(void):          tinycli_register_v,        \
-    int(*)(int):           tinycli_register_i,        \
-    int(*)(double):        tinycli_register_d,        \
-    int(*)(int,int):       tinycli_register_ii,       \
-    int(*)(int,double):    tinycli_register_id,       \
-    int(*)(double,int):    tinycli_register_di,       \
-    int(*)(double,double): tinycli_register_dd) (cmd, func)
+    int(*)(void):           tinycli_register_v,       \
+    int(*)(int):            tinycli_register_i,       \
+    int(*)(double):         tinycli_register_d,       \
+    int(*)(int,int):        tinycli_register_ii,      \
+    int(*)(int,double):     tinycli_register_id,      \
+    int(*)(double,int):     tinycli_register_di,      \
+    int(*)(double,double):  tinycli_register_dd,      \
+    int(*)(double,int,int): tinycli_register_dii) (cmd, func)
 
 #endif // __TINYCLI_H__
