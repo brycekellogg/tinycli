@@ -3,14 +3,12 @@
 
 #include "tinycli.h"
 
+#define TINYCLI_ENTER  '\n'
 
-int tinycli_stoi(const char* c) {
-    return strtol(c, NULL, 0);
-}
+/* Return value
+ */
+int tinycli_result;
 
-double tinycli_stod(const char* c) {
-    return strtod(c, NULL);
-}
 
 
 /* An array of command structures for
@@ -87,6 +85,7 @@ void tinycli_register_sig(const char* text, int (*fun)(void), int sig, int nargs
     numCmds++;
 }
 
+
 enum {v,i,d,ii,id,di,dd,dii};
 void tinycli_register_v  (const char* cmd, int (*f)(void))           { tinycli_register_sig(cmd, (int(*)(void)) f, v,   0); }
 void tinycli_register_i  (const char* cmd, int (*f)(int))            { tinycli_register_sig(cmd, (int(*)(void)) f, i,   1); }
@@ -96,6 +95,14 @@ void tinycli_register_id (const char* cmd, int (*f)(int,double))     { tinycli_r
 void tinycli_register_di (const char* cmd, int (*f)(double,int))     { tinycli_register_sig(cmd, (int(*)(void)) f, di,  2); }
 void tinycli_register_dd (const char* cmd, int (*f)(double,double))  { tinycli_register_sig(cmd, (int(*)(void)) f, dd,  2); }
 void tinycli_register_dii(const char* cmd, int (*f)(double,int,int)) { tinycli_register_sig(cmd, (int(*)(void)) f, dii, 3); }
+
+
+int tinycli_stoi(const char* c) {
+    return strtol(c, NULL, 0);
+}
+double tinycli_stod(const char* c) {
+    return strtod(c, NULL);
+}
 
 
 /* Call a registered callback based on the entered text
@@ -131,28 +138,62 @@ int tinycli_call(int argc, char* argv[]) {
 }
 
 
+/* Add char to tinycli buffer
+ *
+ * Will trigger a command if the
+ * char matches the TINYCLI_ENTER
+ * character.
+ *
+ * Params:
+ *     c = the character to append
+ */
+void tinycli_putc(char c) {
 
+    static int  top = 0;
+    static char buffer[TINYCLI_MAXBUFFER];
+    static char*  argv[TINYCLI_MAXARGC];
 
-static char buffer[TINYCLI_MAXBUFFER];
-static int  top = 0;
+    // Ignore carriage return
+    if (c == '\r') return;
 
-void tinycli_putsn(char* s, int n) {
-    for (int i = 0; i < n; i++) {
-        buffer[top++] = s[i];
-        if (s[i] == '\n') tinycli_process();
+    // Handle backspace
+    if (c == '\b') {
+        top--;
+        return;
+    }
+
+    // Save char
+    buffer[top++] = c;
+
+    // Call stuff
+    if (c == TINYCLI_ENTER) {
+        // Parse command into argv and argc
+        int argc = tokenize(buffer, argv);
+
+        // Try to call function
+        tinycli_result = tinycli_call(argc, argv);
+        top = 0;
     }
 }
 
 
-int tinycli_process() {
-    top = 0;
-   
-    // Parse command
-    char* argv[TINYCLI_MAXARGC];
-    int argc = tokenize(buffer, argv);
-
-    // Call resulting function
-    return tinycli_call(argc, argv);
+/* Add string to tinycli buffer
+ *
+ * Will trigger a command if the char
+ * matches the TINYCLI_ENTER character.
+ * This can possibly happen more that
+ * once if there are multiple lines of
+ * commands to execute.
+ *
+ * Params:
+ *     s = the null terminated string to append
+ *     n = a maximum number of characters to append
+ */
+void tinycli_putsn(char* s, int n) {
+    for (int i = 0; i < n; i++) {
+        if (s[i] == '\0') break;  // Stop at NULL char
+        tinycli_putc(s[i]);
+    }
 }
 
 

@@ -63,6 +63,7 @@ int main() {
     check_d0 = -1;
     check_d1 = -1;
     tinycli_putsn("v\n", 2);        // write command string
+    assert(tinycli_result == 1);
     assert(check_i0 == 0);    // test check variables
     assert(check_i1 == -1);
     assert(check_d0 == -1);

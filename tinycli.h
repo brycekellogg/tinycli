@@ -9,7 +9,9 @@
 #define TINYCLI_ERROR_NUMARGS   -2
 #define TINYCLI_ERROR_NOSIG     -3
 
-int  tinycli_process(void);
+extern int tinycli_result;
+
+void  tinycli_process(void);
 void tinycli_putsn(char* s, int n);
 
 void tinycli_register_v   (const char* cmd, int (*f)(void));
