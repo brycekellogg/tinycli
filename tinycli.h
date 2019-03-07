@@ -11,8 +11,9 @@
 
 extern int tinycli_result;
 
-void  tinycli_process(void);
+void tinycli_process(void);
 void tinycli_putsn(char* s, int n);
+void tinycli_putc(char c);
 
 void tinycli_register_v   (const char* cmd, int (*f)(void));
 void tinycli_register_i   (const char* cmd, int (*f)(int));
