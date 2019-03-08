@@ -2,7 +2,7 @@
 #define __TINYCLI_H__
 
 #define TINYCLI_MAXCMDS    14
-#define TINYCLI_MAXARGC    4
+#define TINYCLI_MAXARGC    10
 #define TINYCLI_MAXBUFFER  100
 
 #define TINYCLI_ERROR_NOCMD     -1
