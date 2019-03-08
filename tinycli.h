@@ -23,6 +23,7 @@ void tinycli_register_id    (const char* cmd, int (*f)(int,double));
 void tinycli_register_di    (const char* cmd, int (*f)(double,int));
 void tinycli_register_dd    (const char* cmd, int (*f)(double,double));
 void tinycli_register_dii   (const char* cmd, int (*f)(double,int,int));
+void tinycli_register_diii  (const char* cmd, int (*f)(double,int,int,int));
 void tinycli_register_diiii (const char* cmd, int (*f)(double,int,int,int,int));
 
 #define tinycli_register(cmd, func) _Generic((func),          \
@@ -34,6 +35,7 @@ void tinycli_register_diiii (const char* cmd, int (*f)(double,int,int,int,int));
     int(*)(double,int):             tinycli_register_di,      \
     int(*)(double,double):          tinycli_register_dd,      \
     int(*)(double,int,int):         tinycli_register_dii,     \
+    int(*)(double,int,int,int):     tinycli_register_diii,    \
     int(*)(double,int,int,int,int): tinycli_register_diiii) (cmd, func)
 
 #endif // __TINYCLI_H__

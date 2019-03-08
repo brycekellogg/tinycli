@@ -86,7 +86,7 @@ void tinycli_register_sig(const char* text, int (*fun)(void), int sig, int nargs
 }
 
 
-enum {v,i,d,ii,id,di,dd,dii,diiii};
+enum {v,i,d,ii,id,di,dd,dii,diii,diiii};
 void tinycli_register_v    (const char* cmd, int (*f)(void))                   { tinycli_register_sig(cmd, (int(*)(void)) f, v,     0); }
 void tinycli_register_i    (const char* cmd, int (*f)(int))                    { tinycli_register_sig(cmd, (int(*)(void)) f, i,     1); }
 void tinycli_register_d    (const char* cmd, int (*f)(double))                 { tinycli_register_sig(cmd, (int(*)(void)) f, d,     1); }
@@ -95,6 +95,7 @@ void tinycli_register_id   (const char* cmd, int (*f)(int,double))             {
 void tinycli_register_di   (const char* cmd, int (*f)(double,int))             { tinycli_register_sig(cmd, (int(*)(void)) f, di,    2); }
 void tinycli_register_dd   (const char* cmd, int (*f)(double,double))          { tinycli_register_sig(cmd, (int(*)(void)) f, dd,    2); }
 void tinycli_register_dii  (const char* cmd, int (*f)(double,int,int))         { tinycli_register_sig(cmd, (int(*)(void)) f, dii,   3); }
+void tinycli_register_diii (const char* cmd, int (*f)(double,int,int,int))     { tinycli_register_sig(cmd, (int(*)(void)) f, diii,  4); }
 void tinycli_register_diiii(const char* cmd, int (*f)(double,int,int,int,int)) { tinycli_register_sig(cmd, (int(*)(void)) f, diiii, 5); }
 
 
@@ -134,6 +135,7 @@ int tinycli_call(int argc, char* argv[]) {
         case di:    return ((int(*)(double,int))             cmds[cmdIndex].fun)(tinycli_stod(argv[1]),tinycli_stoi(argv[2]));
         case dd:    return ((int(*)(double,double))          cmds[cmdIndex].fun)(tinycli_stod(argv[1]),tinycli_stod(argv[2]));
         case dii:   return ((int(*)(double,int,int))         cmds[cmdIndex].fun)(tinycli_stod(argv[1]),tinycli_stoi(argv[2]),tinycli_stoi(argv[3]));
+        case diii:  return ((int(*)(double,int,int,int))     cmds[cmdIndex].fun)(tinycli_stod(argv[1]),tinycli_stoi(argv[2]),tinycli_stoi(argv[3]),tinycli_stoi(argv[4]));
         case diiii: return ((int(*)(double,int,int,int,int)) cmds[cmdIndex].fun)(tinycli_stod(argv[1]),tinycli_stoi(argv[2]),tinycli_stoi(argv[3]),tinycli_stoi(argv[4]),tinycli_stoi(argv[5]));
     }
     return TINYCLI_ERROR_NOSIG;
