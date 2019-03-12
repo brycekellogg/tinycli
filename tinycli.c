@@ -85,24 +85,23 @@ void tinycli_register_sig(const char* text, int (*fun)(void), int sig, int nargs
     numCmds++;
 }
 
+/*
+ *
+ */
+#define tinycli_cmd(s) void tinycli_register_##s (const char* cmd, int (*f)(tinycli_params(s))) { tinycli_register_sig(cmd, (int(*)(void)) f, tinycli_sig(s), tinycli_nargs(s)); }
+#include "tinycli-funs.h"
+#undef tinycli_cmd
 
-enum {v,i,d,ii,id,di,dd,dii,diii,diiii,diiiii};
-void tinycli_register_v     (const char* cmd, int (*f)(void))                       { tinycli_register_sig(cmd, (int(*)(void)) f, v,      0); }
-void tinycli_register_i     (const char* cmd, int (*f)(int))                        { tinycli_register_sig(cmd, (int(*)(void)) f, i,      1); }
-void tinycli_register_d     (const char* cmd, int (*f)(double))                     { tinycli_register_sig(cmd, (int(*)(void)) f, d,      1); }
-void tinycli_register_ii    (const char* cmd, int (*f)(int,int))                    { tinycli_register_sig(cmd, (int(*)(void)) f, ii,     2); }
-void tinycli_register_id    (const char* cmd, int (*f)(int,double))                 { tinycli_register_sig(cmd, (int(*)(void)) f, id,     2); }
-void tinycli_register_di    (const char* cmd, int (*f)(double,int))                 { tinycli_register_sig(cmd, (int(*)(void)) f, di,     2); }
-void tinycli_register_dd    (const char* cmd, int (*f)(double,double))              { tinycli_register_sig(cmd, (int(*)(void)) f, dd,     2); }
-void tinycli_register_dii   (const char* cmd, int (*f)(double,int,int))             { tinycli_register_sig(cmd, (int(*)(void)) f, dii,    3); }
-void tinycli_register_diii  (const char* cmd, int (*f)(double,int,int,int))         { tinycli_register_sig(cmd, (int(*)(void)) f, diii,   4); }
-void tinycli_register_diiii (const char* cmd, int (*f)(double,int,int,int,int))     { tinycli_register_sig(cmd, (int(*)(void)) f, diiii,  5); }
-void tinycli_register_diiiii(const char* cmd, int (*f)(double,int,int,int,int,int)) { tinycli_register_sig(cmd, (int(*)(void)) f, diiiii, 6); }
-
-
+/*
+ *
+ */
 int tinycli_stoi(const char* c) {
     return strtol(c, NULL, 0);
 }
+
+/*
+ *
+ */
 double tinycli_stod(const char* c) {
     return strtod(c, NULL);
 }
@@ -126,19 +125,10 @@ int tinycli_call(int argc, char* argv[]) {
     int cmdIndex = findCmd(argc, argv);
     if (cmdIndex < 0) return TINYCLI_ERROR_NOCMD;
     if (argc != cmds[cmdIndex].nargs+1) return TINYCLI_ERROR_NUMARGS;
-
     switch (cmds[cmdIndex].sig) {
-        case v:      return ((int(*)(void))                       cmds[cmdIndex].fun)();
-        case i:      return ((int(*)(int))                        cmds[cmdIndex].fun)(tinycli_stoi(argv[1]));
-        case d:      return ((int(*)(double))                     cmds[cmdIndex].fun)(tinycli_stod(argv[1]));
-        case ii:     return ((int(*)(int,int))                    cmds[cmdIndex].fun)(tinycli_stoi(argv[1]),tinycli_stoi(argv[2]));
-        case id:     return ((int(*)(int,double))                 cmds[cmdIndex].fun)(tinycli_stoi(argv[1]),tinycli_stod(argv[2]));
-        case di:     return ((int(*)(double,int))                 cmds[cmdIndex].fun)(tinycli_stod(argv[1]),tinycli_stoi(argv[2]));
-        case dd:     return ((int(*)(double,double))              cmds[cmdIndex].fun)(tinycli_stod(argv[1]),tinycli_stod(argv[2]));
-        case dii:    return ((int(*)(double,int,int))             cmds[cmdIndex].fun)(tinycli_stod(argv[1]),tinycli_stoi(argv[2]),tinycli_stoi(argv[3]));
-        case diii:   return ((int(*)(double,int,int,int))         cmds[cmdIndex].fun)(tinycli_stod(argv[1]),tinycli_stoi(argv[2]),tinycli_stoi(argv[3]),tinycli_stoi(argv[4]));
-        case diiii:  return ((int(*)(double,int,int,int,int))     cmds[cmdIndex].fun)(tinycli_stod(argv[1]),tinycli_stoi(argv[2]),tinycli_stoi(argv[3]),tinycli_stoi(argv[4]),tinycli_stoi(argv[5]));
-        case diiiii: return ((int(*)(double,int,int,int,int,int)) cmds[cmdIndex].fun)(tinycli_stod(argv[1]),tinycli_stoi(argv[2]),tinycli_stoi(argv[3]),tinycli_stoi(argv[4]),tinycli_stoi(argv[5]),tinycli_stoi(argv[6]));
+        #define tinycli_cmd(s)  case tinycli_sig(s): return ((int(*)(tinycli_params(s))) cmds[cmdIndex].fun)(tinycli_args(s));
+        #include "tinycli-funs.h"
+        #undef tinycli_cmd
     }
     return TINYCLI_ERROR_NOSIG;
 }
