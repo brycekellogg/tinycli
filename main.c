@@ -48,110 +48,99 @@ int f_dd(double arg0, double arg1) {
 
 int main() {
 
-    // Test void function
-    check_i0 = -1;            // init check variables
+    /* Test void function */
+    check_i0 = -1;            /* init check variables */
     check_i1 = -1;
     check_d0 = -1;
     check_d1 = -1;
-    tinycli_putsn("v\n", 2);        // write command string
+    tinycli_putsn("v\n", 2);        /* write command string */
     assert(tinycli_result == 1);
-    assert(check_i0 == 0);    // test check variables
+    assert(check_i0 == 0);    /* test check variables */
     assert(check_i1 == -1);
     assert(check_d0 == -1);
     assert(check_d1 == -1);
 
 
-    // Test int function
-    check_i0 = -1;            // init check variables
+    /* Test int function */
+    check_i0 = -1;            /* init check variables */
     check_i1 = -1;
     check_d0 = -1;
     check_d1 = -1;
-    tinycli_putsn("i 13\n", 5);     // write command string
-    assert(check_i0 == 13);   // test check variables
-    assert(check_i1 == -1);
-    assert(check_d0 == -1);
-    assert(check_d1 == -1);
-   
-
-    // Test int function (hex)
-    check_i0 = -1;            // init check variables
-    check_i1 = -1;
-    check_d0 = -1;
-    check_d1 = -1;
-    tinycli_putsn("i 0x13\n", 7);   // write command string
-    assert(check_i0 == 0x13); // test check variables
+    tinycli_putsn("i 13\n", 5);     /* write command string */
+    assert(check_i0 == 13);   /* test check variables */
     assert(check_i1 == -1);
     assert(check_d0 == -1);
     assert(check_d1 == -1);
    
 
-    // Test double function
-    check_i0 = -1;            // init check variables
+    /* Test int function (hex) */
+    check_i0 = -1;            /* init check variables */
     check_i1 = -1;
     check_d0 = -1;
     check_d1 = -1;
-    tinycli_putsn("d 1.3\n", 6);    // write command string
-    assert(check_i0 == -1);   // test check variables
+    tinycli_putsn("i 0x13\n", 7);   /* write command string */
+    assert(check_i0 == 0x13); /* test check variables */
+    assert(check_i1 == -1);
+    assert(check_d0 == -1);
+    assert(check_d1 == -1);
+   
+
+    /* Test double function */
+    check_i0 = -1;            /* init check variables */
+    check_i1 = -1;
+    check_d0 = -1;
+    check_d1 = -1;
+    tinycli_putsn("d 1.3\n", 6);    /* write command string */
+    assert(check_i0 == -1);   /* test check variables */
     assert(check_i1 == -1);
     assert(check_d0 == 1.3);
     assert(check_d1 == -1);
    
 
-    // Test int,int function
-    check_i0 = -1;            // init check variables
+    /* Test int,int function */
+    check_i0 = -1;            /* init check variables */
     check_i1 = -1;
     check_d0 = -1;
     check_d1 = -1;
-    tinycli_putsn("ii 12 -5\n", 9); // write command string
-    assert(check_i0 == 12);   // test check variables
+    tinycli_putsn("ii 12 -5\n", 9); /* write command string */
+    assert(check_i0 == 12);   /* test check variables */
     assert(check_i1 == -5);
     assert(check_d0 == -1);
     assert(check_d1 == -1);
 
     
-    // Test int,double function
-    check_i0 = -1;            // init check variables
+    /* Test int,double function */
+    check_i0 = -1;            /* init check variables */
     check_i1 = -1;
     check_d0 = -1;
     check_d1 = -1;
     tinycli_putsn("id 12 -0.123\n", 13);
-    assert(check_i0 == 12);   // test check variables
+    assert(check_i0 == 12);   /* test check variables */
     assert(check_i1 == -1);
     assert(check_d0 == -1);
     assert(check_d1 == -0.123);
 
-    // Test double,int function
-    check_i0 = -1;            // init check variable
+    /* Test double,int function */
+    check_i0 = -1;            /* init check variable */
     check_i1 = -1;
     check_d0 = -1;
     check_d1 = -1;
     tinycli_putsn("di 123.0 12\n", 12);
-    assert(check_i0 == -1);   // test check variables
+    assert(check_i0 == -1);   /* test check variables */
     assert(check_i1 == 12);
     assert(check_d0 == 123.0);
     assert(check_d1 == -1);
 
-    // Test double,double function
-    check_i0 = -1;            // init check variable
+    /* Test double,double function */
+    check_i0 = -1;            /* init check variable */
     check_i1 = -1;
     check_d0 = -1;
     check_d1 = -1;
     tinycli_putsn("dd 123.0 12\n", 12);
-    assert(check_i0 == -1);   // test check variables
+    assert(check_i0 == -1);   /* test check variables */
     assert(check_i1 == -1);
     assert(check_d0 == 123.0);
     assert(check_d1 == 12.0);
     
-    
-    // Read in lines
-    //for(;;) {
-        //char c = getchar();
-        //tinycli_putc(c);
-        //tinycli_process();
-    //}
-
-
-
-
     return 0;
 }

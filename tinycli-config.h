@@ -1,3 +1,14 @@
+/*  _______ _____ _   ___     _______ _      _____ 
+ * |__   __|_   _| \ | \ \   / / ____| |    |_   _|
+ *    | |    | | |  \| |\ \_/ / |    | |      | |  
+ *    | |    | | | . ` | \   /| |    | |      | |  
+ *    | |   _| |_| |\  |  | | | |____| |____ _| |_ 
+ *    |_|  |_____|_| \_|  |_|  \_____|______|_____|
+ *
+ * Author: Bryce Kellogg (brycekellogg+tinycli@brycekellogg.com)
+ * Copyright: 2019 Bryce Kellogg
+ * License: BSD 3-Clause
+ */
 #ifndef __TINYCLI_CONFIG_H__
 #define __TINYCLI_CONFIG_H__
 
@@ -37,4 +48,4 @@
 #define tinycli_nargs_diiii  5
 #define tinycli_nargs_diiiii 6
 
-#endif // __TINYCLI_CONFIG_H__
+#endif /* __TINYCLI_CONFIG_H__  */

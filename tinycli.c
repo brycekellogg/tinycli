@@ -1,3 +1,14 @@
+/*  _______ _____ _   ___     _______ _      _____ 
+ * |__   __|_   _| \ | \ \   / / ____| |    |_   _|
+ *    | |    | | |  \| |\ \_/ / |    | |      | |  
+ *    | |    | | | . ` | \   /| |    | |      | |  
+ *    | |   _| |_| |\  |  | | | |____| |____ _| |_ 
+ *    |_|  |_____|_| \_|  |_|  \_____|______|_____|
+ *
+ * Author: Bryce Kellogg (brycekellogg+tinycli@brycekellogg.com)
+ * Copyright: 2019 Bryce Kellogg
+ * License: BSD 3-Clause
+ */
 #include <stdlib.h>
 #include <string.h>
 
@@ -18,6 +29,7 @@ enum {
     #define tinycli_register(txt, fun, type) tinycli_##type,
     #include "tinycli-funs.h"
     #undef tinycli_register
+    tinycli_numsigs
 };
 
 #define tinycli_register(txt, fun, type) int fun(tinycli_params(type));
@@ -73,7 +85,8 @@ int tokenize(char* str, char* argv[]) {
 /* Find the index of the command given
  * by the string at argv[0].  */
 static int findCmd(int argc, char* argv[]) {
-    for (int i = 0; i < numCmds; i++) {
+    int i;
+    for (i = 0; i < numCmds; i++) {
         if (!strcmp(argv[0], cmds[i].text)) return i;
     }
     return -1;
@@ -109,7 +122,7 @@ double tinycli_stod(const char* c) {
  */
 int tinycli_call(int argc, char* argv[]) {
     
-    // Get command index
+    /* Get command index */
     int cmdIndex = findCmd(argc, argv);
     if (cmdIndex < 0) return TINYCLI_ERROR_NOCMD;
     if (argc != cmds[cmdIndex].nargs+1) return TINYCLI_ERROR_NUMARGS;
@@ -137,24 +150,24 @@ void tinycli_putc(char c) {
     static char buffer[TINYCLI_MAXBUFFER];
     static char*  argv[TINYCLI_MAXARGC];
 
-    // Ignore carriage return
+    /* Ignore carriage return */
     if (c == '\r') return;
 
-    // Handle backspace
+    /* Handle backspace */
     if (c == '\b') {
         top--;
         return;
     }
 
-    // Save char
+    /* Save char */
     buffer[top++] = c;
 
-    // Call stuff
+    /* Call stuff */
     if (c == TINYCLI_ENTER) {
-        // Parse command into argv and argc
+        /* Parse command into argv and argc */
         int argc = tokenize(buffer, argv);
 
-        // Try to call function
+        /* Try to call function */
         tinycli_result = tinycli_call(argc, argv);
         top = 0;
     }
@@ -174,8 +187,9 @@ void tinycli_putc(char c) {
  *     n = a maximum number of characters to append
  */
 void tinycli_putsn(char* s, int n) {
-    for (int i = 0; i < n; i++) {
-        if (s[i] == '\0') break;  // Stop at NULL char
+    int i;
+    for (i = 0; i < n; i++) {
+        if (s[i] == '\0') break;  /* Stop at NULL char */
         tinycli_putc(s[i]);
     }
 }
