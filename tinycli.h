@@ -56,18 +56,11 @@ void tinycli_putc(char c);
 #define tinycli_nargs_diiii  5
 #define tinycli_nargs_diiiii 6
 
-#define tinycli_v        0
-#define tinycli_i        1
-#define tinycli_d        2
-#define tinycli_ii       3
-#define tinycli_id       4
-#define tinycli_di       5
-#define tinycli_dd       6
-#define tinycli_dii      7
-#define tinycli_diii     8
-#define tinycli_diiii    9
-#define tinycli_diiiii  10
-
+enum {
+#define tinycli_cmd(s) tinycli_##s,
+#include "tinycli-funs.h"
+#undef tinycli_cmd
+};
 
 #define tinycli_cmd(s)  void tinycli_register_##s (const char* cmd, int (*f)(tinycli_params(s)));
 #include "tinycli-funs.h"
