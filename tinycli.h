@@ -27,17 +27,18 @@ void tinycli_putc(char c);
 #define tinycli_params_diiii    double,int,int,int,int
 #define tinycli_params_diiiii   double,int,int,int,int,int
 
+
 #define tinycli_args_v
 #define tinycli_args_i          tinycli_stoi(argv[1])
 #define tinycli_args_d          tinycli_stod(argv[1])
-#define tinycli_args_ii         tinycli_stoi(argv[1]),tinycli_stoi(argv[2])
-#define tinycli_args_id         tinycli_stoi(argv[1]),tinycli_stod(argv[2])
-#define tinycli_args_di         tinycli_stod(argv[1]),tinycli_stoi(argv[2])
-#define tinycli_args_dd         tinycli_stod(argv[1]),tinycli_stod(argv[2])
-#define tinycli_args_dii        tinycli_stod(argv[1]),tinycli_stoi(argv[2]),tinycli_stoi(argv[3])
-#define tinycli_args_diii       tinycli_stod(argv[1]),tinycli_stoi(argv[2]),tinycli_stoi(argv[3]),tinycli_stoi(argv[4])
-#define tinycli_args_diiii      tinycli_stod(argv[1]),tinycli_stoi(argv[2]),tinycli_stoi(argv[3]),tinycli_stoi(argv[4]),tinycli_stoi(argv[5])
-#define tinycli_args_diiiii     tinycli_stod(argv[1]),tinycli_stoi(argv[2]),tinycli_stoi(argv[3]),tinycli_stoi(argv[4]),tinycli_stoi(argv[5]),tinycli_stoi(argv[6])
+#define tinycli_args_ii         tinycli_args_i,    tinycli_stoi(argv[2])
+#define tinycli_args_id         tinycli_args_i,    tinycli_stod(argv[2])
+#define tinycli_args_di         tinycli_args_d,    tinycli_stoi(argv[2])
+#define tinycli_args_dd         tinycli_args_d,    tinycli_stod(argv[2])
+#define tinycli_args_dii        tinycli_args_di,   tinycli_stoi(argv[3])
+#define tinycli_args_diii       tinycli_args_dii,  tinycli_stoi(argv[4])
+#define tinycli_args_diiii      tinycli_args_diii, tinycli_stoi(argv[5])
+#define tinycli_args_diiiii     tinycli_args_diiii,tinycli_stoi(argv[6])
 
 #define tinycli_args(s)   tinycli_args_##s
 #define tinycli_nargs(s)  tinycli_nargs_##s
@@ -56,9 +57,9 @@ void tinycli_putc(char c);
 #define tinycli_nargs_diiiii 6
 
 enum {
-#define tinycli_cmd(s) tinycli_##s,
-#include "tinycli-funs.h"
-#undef tinycli_cmd
+    #define tinycli_cmd(s) tinycli_##s,
+    #include "tinycli-funs.h"
+    #undef tinycli_cmd
 };
 
 #define tinycli_cmd(s)  void tinycli_register_##s (const char* cmd, int (*f)(tinycli_params(s)));
