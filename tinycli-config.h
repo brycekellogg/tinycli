@@ -4,14 +4,14 @@
 #define tinycli_params_v        void
 #define tinycli_params_i        int
 #define tinycli_params_d        double
-#define tinycli_params_ii       int,int
-#define tinycli_params_id       int,double
-#define tinycli_params_di       double,int
-#define tinycli_params_dd       double,double
-#define tinycli_params_dii      double,int,int
-#define tinycli_params_diii     double,int,int,int
-#define tinycli_params_diiii    double,int,int,int,int
-#define tinycli_params_diiiii   double,int,int,int,int,int
+#define tinycli_params_ii       tinycli_params_i,     tinycli_params_i
+#define tinycli_params_id       tinycli_params_i,     tinycli_params_d
+#define tinycli_params_di       tinycli_params_d,     tinycli_params_i
+#define tinycli_params_dd       tinycli_params_d,     tinycli_params_d
+#define tinycli_params_dii      tinycli_params_di,    tinycli_params_i
+#define tinycli_params_diii     tinycli_params_dii,   tinycli_params_i
+#define tinycli_params_diiii    tinycli_params_diii,  tinycli_params_i
+#define tinycli_params_diiiii   tinycli_params_diiii, tinycli_params_i
 
 #define tinycli_args_v
 #define tinycli_args_i          tinycli_stoi(argv[1])

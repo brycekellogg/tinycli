@@ -32,7 +32,7 @@ static struct {
     int(*fun)(void);
     int sig;
     int nargs;
-} cmds[TINYCLI_MAXCMDS] = {
+} cmds[] = {
     #define tinycli_register(txt ,fun, type)  {txt,  (int(*)(void))fun,  tinycli_##type,  tinycli_nargs(type)},
     #include "tinycli-funs.h"
     #undef tinycli_register
@@ -42,7 +42,7 @@ static struct {
 /* The number of commands that
  * have been registered. This cannot
  * exceed TINYCLI_MAXCMDS. */
-static int numCmds = 7;
+static int numCmds = sizeof(cmds);
 
 
 /*
