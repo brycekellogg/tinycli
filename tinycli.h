@@ -39,7 +39,6 @@ void tinycli_putc(char c);
 #define tinycli_args_diiii      tinycli_stod(argv[1]),tinycli_stoi(argv[2]),tinycli_stoi(argv[3]),tinycli_stoi(argv[4]),tinycli_stoi(argv[5])
 #define tinycli_args_diiiii     tinycli_stod(argv[1]),tinycli_stoi(argv[2]),tinycli_stoi(argv[3]),tinycli_stoi(argv[4]),tinycli_stoi(argv[5]),tinycli_stoi(argv[6])
 
-#define tinycli_sig(s)    tinycli_##s
 #define tinycli_args(s)   tinycli_args_##s
 #define tinycli_nargs(s)  tinycli_nargs_##s
 #define tinycli_params(s) tinycli_params_##s

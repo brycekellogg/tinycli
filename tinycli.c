@@ -88,7 +88,7 @@ void tinycli_register_sig(const char* text, int (*fun)(void), int sig, int nargs
 /*
  *
  */
-#define tinycli_cmd(s) void tinycli_register_##s (const char* cmd, int (*f)(tinycli_params(s))) { tinycli_register_sig(cmd, (int(*)(void)) f, tinycli_sig(s), tinycli_nargs(s)); }
+#define tinycli_cmd(s) void tinycli_register_##s (const char* cmd, int (*f)(tinycli_params(s))) { tinycli_register_sig(cmd, (int(*)(void)) f, tinycli_##s, tinycli_nargs(s)); }
 #include "tinycli-funs.h"
 #undef tinycli_cmd
 
@@ -126,7 +126,7 @@ int tinycli_call(int argc, char* argv[]) {
     if (cmdIndex < 0) return TINYCLI_ERROR_NOCMD;
     if (argc != cmds[cmdIndex].nargs+1) return TINYCLI_ERROR_NUMARGS;
     switch (cmds[cmdIndex].sig) {
-        #define tinycli_cmd(s)  case tinycli_sig(s): return ((int(*)(tinycli_params(s))) cmds[cmdIndex].fun)(tinycli_args(s));
+        #define tinycli_cmd(s)  case tinycli_##s: return ((int(*)(tinycli_params(s))) cmds[cmdIndex].fun)(tinycli_args(s));
         #include "tinycli-funs.h"
         #undef tinycli_cmd
     }
