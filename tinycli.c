@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "tinycli.h"
+#include "tinycli-config.h"
 
 #define TINYCLI_ENTER  '\n'
 
@@ -9,7 +10,19 @@
  */
 int tinycli_result;
 
+#define tinycli_args(s)   tinycli_args_##s
+#define tinycli_nargs(s)  tinycli_nargs_##s
+#define tinycli_params(s) tinycli_params_##s
 
+enum {
+    #define tinycli_register(txt, fun, type) tinycli_##type,
+    #include "tinycli-funs.h"
+    #undef tinycli_register
+};
+
+#define tinycli_register(txt, fun, type) int fun(tinycli_params(type));
+#include "tinycli-funs.h"
+#undef tinycli_register
 
 /* An array of command structures for
  * storing info needed for calling a
@@ -19,13 +32,17 @@ static struct {
     int(*fun)(void);
     int sig;
     int nargs;
-} cmds[TINYCLI_MAXCMDS];
+} cmds[TINYCLI_MAXCMDS] = {
+    #define tinycli_register(txt ,fun, type)  {txt,  (int(*)(void))fun,  tinycli_##type,  tinycli_nargs(type)},
+    #include "tinycli-funs.h"
+    #undef tinycli_register
+};
 
 
 /* The number of commands that
  * have been registered. This cannot
  * exceed TINYCLI_MAXCMDS. */
-static int numCmds = 0;
+static int numCmds = 7;
 
 
 /*
@@ -63,35 +80,6 @@ static int findCmd(int argc, char* argv[]) {
 }
 
 
-/* Register a command
- *
- * If you don't want to specify the specific TINYCLI_SIG_?? macro,
- * you can instead call the helper functions: tincli_regiser_??().
- *
- * Params:
- *    text = a string literal of the text that will trigger this command.
- *           This should be a single word with no surrounding whitespace.
- *    fun  = the function to call when this command is encountered but
- *           cast to an int(*)(void) signature.
- *    sig  = the true signature of the callback function as defined in
- *           the TINYCLI_SIG_?? macros.
- */
-void tinycli_register_sig(const char* text, int (*fun)(void), int sig, int nargs) {
-    if (numCmds >= TINYCLI_MAXCMDS) return;
-    cmds[numCmds].text  = text;
-    cmds[numCmds].fun   = fun;
-    cmds[numCmds].sig   = sig;
-    cmds[numCmds].nargs = nargs;
-    numCmds++;
-}
-
-/*
- *
- */
-#define tinycli_cmd(s) void tinycli_register_##s (const char* cmd, int (*f)(tinycli_params(s))) { tinycli_register_sig(cmd, (int(*)(void)) f, tinycli_##s, tinycli_nargs(s)); }
-#include "tinycli-funs.h"
-#undef tinycli_cmd
-
 /*
  *
  */
@@ -126,9 +114,9 @@ int tinycli_call(int argc, char* argv[]) {
     if (cmdIndex < 0) return TINYCLI_ERROR_NOCMD;
     if (argc != cmds[cmdIndex].nargs+1) return TINYCLI_ERROR_NUMARGS;
     switch (cmds[cmdIndex].sig) {
-        #define tinycli_cmd(s)  case tinycli_##s: return ((int(*)(tinycli_params(s))) cmds[cmdIndex].fun)(tinycli_args(s));
+        #define tinycli_register(txt, f, type)  case tinycli_##type: return ((int(*)(tinycli_params(type))) cmds[cmdIndex].fun)(tinycli_args(type));
         #include "tinycli-funs.h"
-        #undef tinycli_cmd
+        #undef tinycli_register
     }
     return TINYCLI_ERROR_NOSIG;
 }

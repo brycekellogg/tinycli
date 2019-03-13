@@ -37,18 +37,4 @@
 #define tinycli_nargs_diiii  5
 #define tinycli_nargs_diiiii 6
 
-#define tinycli_register(cmd, func) _Generic((func),         \
-    int(*)(tinycli_params_v):      tinycli_register_v,       \
-    int(*)(tinycli_params_i):      tinycli_register_i,       \
-    int(*)(tinycli_params_d):      tinycli_register_d,       \
-    int(*)(tinycli_params_ii):     tinycli_register_ii,      \
-    int(*)(tinycli_params_id):     tinycli_register_id,      \
-    int(*)(tinycli_params_di):     tinycli_register_di,      \
-    int(*)(tinycli_params_dd):     tinycli_register_dd,      \
-    int(*)(tinycli_params_dii):    tinycli_register_dii,     \
-    int(*)(tinycli_params_diii):   tinycli_register_diii,    \
-    int(*)(tinycli_params_diiii):  tinycli_register_diiii,   \
-    int(*)(tinycli_params_diiiii): tinycli_register_diiiii,  \
-    default: NULL) (cmd, func)
-
 #endif // __TINYCLI_CONFIG_H__

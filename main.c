@@ -48,15 +48,6 @@ int f_dd(double arg0, double arg1) {
 
 int main() {
 
-    // Register functions
-    tinycli_register("v",  f_v);
-    tinycli_register("i",  f_i);
-    tinycli_register("d",  f_d);
-    tinycli_register("ii", f_ii);
-    tinycli_register("id", f_id);
-    tinycli_register("di", f_di);
-    tinycli_register("dd", f_dd);
-
     // Test void function
     check_i0 = -1;            // init check variables
     check_i1 = -1;
