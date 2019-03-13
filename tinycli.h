@@ -68,18 +68,10 @@ void tinycli_putc(char c);
 #define tinycli_diiii    9
 #define tinycli_diiiii  10
 
-void tinycli_register_v      (const char* cmd, int (*f)(tinycli_params_v));
-void tinycli_register_i      (const char* cmd, int (*f)(tinycli_params_i));
-void tinycli_register_d      (const char* cmd, int (*f)(tinycli_params_d));
-void tinycli_register_ii     (const char* cmd, int (*f)(tinycli_params_ii));
-void tinycli_register_id     (const char* cmd, int (*f)(tinycli_params_id));
-void tinycli_register_di     (const char* cmd, int (*f)(tinycli_params_di));
-void tinycli_register_dd     (const char* cmd, int (*f)(tinycli_params_dd));
-void tinycli_register_dii    (const char* cmd, int (*f)(tinycli_params_dii));
-void tinycli_register_diii   (const char* cmd, int (*f)(tinycli_params_diii));
-void tinycli_register_diiii  (const char* cmd, int (*f)(tinycli_params_diiii));
-void tinycli_register_diiiii (const char* cmd, int (*f)(tinycli_params_diiiii));
 
+#define tinycli_cmd(s)  void tinycli_register_##s (const char* cmd, int (*f)(tinycli_params(s)));
+#include "tinycli-funs.h"
+#undef tinycli_cmd
 
 #define tinycli_register(cmd, func) _Generic((func),         \
     int(*)(tinycli_params_v):      tinycli_register_v,       \
