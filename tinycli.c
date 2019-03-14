@@ -17,14 +17,18 @@
 
 #define TINYCLI_ENTER  '\n'
 
-/* Return value
- */
-int tinycli_result;
-
 #define tinycli_args(s)   tinycli_args_##s
 #define tinycli_nargs(s)  tinycli_nargs_##s
 #define tinycli_params(s) tinycli_params_##s
 
+
+/* Return value
+ */
+int tinycli_result;
+
+
+/* Declare signatures enum
+ */
 enum {
     #define tinycli_register(txt, fun, type) tinycli_##type,
     #include "tinycli-funs.h"
@@ -32,9 +36,13 @@ enum {
     tinycli_numsigs
 };
 
+
+/* Declare functions
+ */
 #define tinycli_register(txt, fun, type) int fun(tinycli_params(type));
 #include "tinycli-funs.h"
 #undef tinycli_register
+
 
 /* An array of command structures for
  * storing info needed for calling a
