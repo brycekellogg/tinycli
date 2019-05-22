@@ -34,16 +34,25 @@ def getdefines(s, width):
     params = ",".join(s)
     regexp = re.compile('|'.join(paramsubs.keys()))
     params = regexp.sub(lambda match: paramsubs[match.group(0)], params)
-    params = f"#define tinycli_params_{s} {params}"
+    params = f"#define tinycli_params_{s} {params:{width}}"
 
     # args
-    args = ",".join(s)
-    regexp = re.compile('|'.join(argsubs.keys()))
-    args = regexp.sub(lambda match: argsubs[match.group(0)], args)
-    i = 0
-    for c in args:
+    if s == 'v':
+        args2 = ""
+    else:
+        args = ",".join(s)
+        regexp = re.compile('|'.join(argsubs.keys()))
+        args = regexp.sub(lambda match: argsubs[match.group(0)], args)
+        i = 0
+        args2 = ''
+        for c in args:
+            if c == '[':
+                args2 += '[' + str(i)
+                i += 1
+            else:
+                args2 += c
 
-    args = f"#define tinycli_args_{s} {args}"
+    args = f"#define tinycli_args_{s} {args2:{width}}"
 
     # nargs
     nargs = len(s) if s != "v" else 0
@@ -52,6 +61,18 @@ def getdefines(s, width):
     return (params, args, nargs)
 
 
+paramsList = []
+argsList   = []
+nargsList  = []
+for s in sigs:
+    params, args, nargs = getdefines(s, 20)
+    paramsList.append(params)
+    argsList.append(args)
+    nargsList.append(nargs)
 
-pprint(getdefines("v",0))
-pprint(getdefines("idiiddi",0))
+for s in paramsList:
+    print(s)
+for s in argsList:
+    print(s)
+for s in nargsList:
+    print(s)
