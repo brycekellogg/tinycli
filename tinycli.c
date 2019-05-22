@@ -26,44 +26,14 @@
  */
 int tinycli_result;
 
-
-/* Declare signatures enum
- */
-enum {
-    #define tinycli_register(txt, fun, type) tinycli_##type,
-    #include "tinycli-funs.h"
-    #undef tinycli_register
-    tinycli_numsigs
-};
-
-
 /* Declare functions
+ *
+ * This is here because we actually call the registered functions
+ * from this file. Thus we need them declared here.
  */
 #define tinycli_register(txt, fun, type) int fun(tinycli_params(type));
 #include "tinycli-funs.h"
 #undef tinycli_register
-
-
-/* An array of command structures for
- * storing info needed for calling a
- * function for a specific command.  */
-static struct {
-    const char* text;
-    int(*fun)(void);
-    int sig;
-    int nargs;
-} cmds[] = {
-    #define tinycli_register(txt ,fun, type)  {txt,  (int(*)(void))fun,  tinycli_##type,  tinycli_nargs(type)},
-    #include "tinycli-funs.h"
-    #undef tinycli_register
-};
-
-
-/* The number of commands that
- * have been registered. This cannot
- * exceed TINYCLI_MAXCMDS. */
-static int numCmds = sizeof(cmds);
-
 
 /*
  * Tokenize a string into argc/argv format
@@ -87,17 +57,6 @@ int tokenize(char* str, char* argv[]) {
     argv[argc] = strtok(str, " \n");
     while (++argc < TINYCLI_MAXARGC && (argv[argc] = strtok(NULL, " ")));
     return argc;
-}
-
-
-/* Find the index of the command given
- * by the string at argv[0].  */
-static int findCmd(int argc, char* argv[]) {
-    int i;
-    for (i = 0; i < numCmds; i++) {
-        if (!strcmp(argv[0], cmds[i].text)) return i;
-    }
-    return -1;
 }
 
 
@@ -129,17 +88,15 @@ double tinycli_stod(const char* c) {
  *          or if the arguments converted incorrectedly.
  */
 int tinycli_call(int argc, char* argv[]) {
-    
-    /* Get command index */
-    int cmdIndex = findCmd(argc, argv);
-    if (cmdIndex < 0) return TINYCLI_ERROR_NOCMD;
-    if (argc != cmds[cmdIndex].nargs+1) return TINYCLI_ERROR_NUMARGS;
-    switch (cmds[cmdIndex].sig) {
-        #define tinycli_register(txt, f, type)  case tinycli_##type: return ((int(*)(tinycli_params(type))) cmds[cmdIndex].fun)(tinycli_args(type));
-        #include "tinycli-funs.h"
-        #undef tinycli_register
-    }
-    return TINYCLI_ERROR_NOSIG;
+   
+    #define tinycli_register(txt, f, type) \
+    if (!strcmp(argv[0], txt)) {            \
+        return (argc-1 == tinycli_nargs(type)) ? f(tinycli_args(type)) : TINYCLI_ERROR_NUMARGS; \
+    } 
+    #include "tinycli-funs.h"
+    #undef tinycli_register
+
+    return TINYCLI_ERROR_NOCMD;
 }
 
 
