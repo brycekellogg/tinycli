@@ -17,10 +17,6 @@
 
 #define TINYCLI_ENTER  '\n'
 
-#define tinycli_args(s)   tinycli_args_##s
-#define tinycli_nargs(s)  tinycli_nargs_##s
-#define tinycli_params(s) tinycli_params_##s
-
 
 /* Return value
  */
@@ -31,7 +27,7 @@ int tinycli_result;
  * This is here because we actually call the registered functions
  * from this file. Thus we need them declared here.
  */
-#define tinycli_register(txt, fun, type) int fun(tinycli_params(type));
+#define tinycli_register(txt, fun, type) int fun(tinycli_params_##type);
 #include "tinycli-funs.h"
 #undef tinycli_register
 
@@ -91,7 +87,7 @@ int tinycli_call(int argc, char* argv[]) {
    
     #define tinycli_register(txt, f, type) \
     if (!strcmp(argv[0], txt)) {            \
-        return (argc-1 == tinycli_nargs(type)) ? f(tinycli_args(type)) : TINYCLI_ERROR_NUMARGS; \
+        return (argc == 1+tinycli_nargs_##type) ? f(tinycli_args_##type) : TINYCLI_ERROR_NUMARGS; \
     } 
     #include "tinycli-funs.h"
     #undef tinycli_register
