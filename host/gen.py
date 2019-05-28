@@ -8,7 +8,6 @@
 # Author: Bryce Kellogg (brycekellogg+tinycli@brycekellogg.com)
 # Copyright: 2019 Bryce Kellogg
 # License: BSD 3-Clause
-from pprint import pprint
 import re
 from itertools import product
 
