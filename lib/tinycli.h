@@ -20,7 +20,15 @@
 
 extern int tinycli_result;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void tinycli_putsn(char* s, int n);
 void tinycli_putc(char c);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __TINYCLI_H__ */
