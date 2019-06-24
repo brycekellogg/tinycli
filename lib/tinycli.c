@@ -125,6 +125,10 @@ void tinycli_putc(char c) {
 
     /* Call stuff */
     if (c == TINYCLI_ENTER) {
+
+        /* Set null character after <enter> */
+        buffer[top] = '\0';
+
         /* Parse command into argv and argc */
         int argc = tokenize(buffer, argv);
 
