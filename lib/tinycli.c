@@ -70,6 +70,10 @@ double tinycli_stod(const char* c) {
     return strtod(c, NULL);
 }
 
+const char* tinycli_stos(const char* c) {
+    return c;
+}
+
 
 /* Call a registered callback based on the entered text
  *

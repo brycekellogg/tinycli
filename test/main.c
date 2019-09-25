@@ -1,11 +1,14 @@
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 #include "tinycli.h"
 
 int    check_i0;
 int    check_i1;
 double check_d0;
 double check_d1;
+int    check_s0;
+int    check_s1;
 
 int f_v(void) {
     check_i0 = 0;
@@ -44,6 +47,12 @@ int f_dd(double arg0, double arg1) {
     check_d0 = arg0;
     check_d1 = arg1;
     return 7;
+}
+
+int f_s(char* arg0) {
+    check_s0 = strcmp(arg0, "helloWorld\n");
+    check_s1 = strcmp(arg0, "abc");
+    return 1;
 }
 
 int main() {
@@ -142,5 +151,14 @@ int main() {
     assert(check_d0 == 123.0);
     assert(check_d1 == 12.0);
     
+    /* Test double,double function */
+    check_i0 = -1;            /* init check variable */
+    check_i1 = -1;
+    check_d0 = -1;
+    check_d1 = -1;
+    tinycli_putsn("s helloWorld\n", 13);
+    assert(check_s0 == 0);   /* test check variables */
+    assert(check_s1 > 0);
+
     return 0;
 }
