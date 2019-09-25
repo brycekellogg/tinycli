@@ -114,6 +114,7 @@ void tinycli_putc(char c) {
     static int  top = 0;
     static char buffer[TINYCLI_MAXBUFFER];
     static char*  argv[TINYCLI_MAXARGC];
+    int argc;
 
     /* Ignore carriage return */
     if (c == '\r') return;
@@ -134,7 +135,7 @@ void tinycli_putc(char c) {
         buffer[top] = '\0';
 
         /* Parse command into argv and argc */
-        int argc = tokenize(buffer, argv);
+        argc = tokenize(buffer, argv);
 
         /* Try to call function */
         tinycli_result = tinycli_call(argc, argv);
