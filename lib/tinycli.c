@@ -132,7 +132,7 @@ void tinycli_putc(char c) {
     if (c == TINYCLI_ENTER) {
 
         /* Set null character after <enter> */
-        buffer[top] = '\0';
+        buffer[--top] = '\0';
 
         /* Parse command into argv and argc */
         argc = tokenize(buffer, argv);

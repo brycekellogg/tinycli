@@ -50,7 +50,7 @@ int f_dd(double arg0, double arg1) {
 }
 
 int f_s(char* arg0) {
-    check_s0 = strcmp(arg0, "helloWorld\n");
+    check_s0 = strcmp(arg0, "helloWorld");
     check_s1 = strcmp(arg0, "abc");
     return 1;
 }
