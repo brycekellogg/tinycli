@@ -15,8 +15,6 @@
 #include "tinycli.h"
 #include "tinycli-config.h"
 
-#define TINYCLI_ENTER  '\n'
-
 
 /* Return value
  */
@@ -50,8 +48,8 @@ int tinycli_result;
  */
 int tokenize(char* str, char* argv[]) {
     int argc = 0;
-    argv[argc] = strtok(str, " \n");
-    while (++argc < TINYCLI_MAXARGC && (argv[argc] = strtok(NULL, " ")));
+    argv[argc] = strtok(str, TINYCLI_TOKDELIM);
+    while (++argc < TINYCLI_MAXARGC && (argv[argc] = strtok(NULL, TINYCLI_TOKDELIM)));
     return argc;
 }
 
@@ -115,9 +113,12 @@ void tinycli_putc(char c) {
     static char buffer[TINYCLI_MAXBUFFER];
     static char*  argv[TINYCLI_MAXARGC];
     int argc;
+    int i;
 
-    /* Ignore carriage return */
-    if (c == '\r') return;
+    /* Ignore certain characters */
+    for (i = 0; i < sizeof(TINYCLI_SKIPCHARS); i++) {
+        if (c == TINYCLI_SKIPCHARS[i]) return;
+    }
 
     /* Handle backspace */
     if (c == '\b') {

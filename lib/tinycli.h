@@ -15,6 +15,18 @@
 #define TINYCLI_MAXARGC    10
 #define TINYCLI_MAXBUFFER  100
 
+#ifndef TINYCLI_ENTER
+#define TINYCLI_ENTER  '\n'
+#endif
+
+#ifndef TINYCLI_SKIPCHARS
+#define TINYCLI_SKIPCHARS  "\r\t"
+#endif
+
+#ifndef TINYCLI_TOKDELIM
+#define TINYCLI_TOKDELIM  " "
+#endif
+
 #define TINYCLI_ERROR_NOCMD     -1
 #define TINYCLI_ERROR_NUMARGS   -2
 
