@@ -86,7 +86,11 @@ const char* tinycli_stos(const char* c) {
  *          or if the arguments converted incorrectedly.
  */
 int tinycli_call(int argc, char* argv[]) {
-   
+    /* Skip calls that have no commands */
+    if (argc < 1) {
+        return TINYCLI_ERROR_NOCALL;
+    }
+
     #define tinycli_register(txt, f, type) \
     if (!strcmp(argv[0], txt)) {            \
         return (argc == 1+tinycli_nargs_##type) ? f(tinycli_args_##type) : TINYCLI_ERROR_NUMARGS; \

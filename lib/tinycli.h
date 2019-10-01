@@ -29,6 +29,7 @@
 
 #define TINYCLI_ERROR_NOCMD     -1
 #define TINYCLI_ERROR_NUMARGS   -2
+#define TINYCLI_ERROR_NOCALL    -3
 
 extern int tinycli_result;
 
