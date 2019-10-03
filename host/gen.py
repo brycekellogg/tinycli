@@ -51,7 +51,7 @@ def getdefines(s, width):
 # Build list of signatures to define
 possibleSigs = ['i','d', 's', 'l']
 sigs = ['v']
-for i in range(1,6):
+for i in range(1,7):
     sigs += list(map("".join, product(possibleSigs, repeat=i)))
 
 
