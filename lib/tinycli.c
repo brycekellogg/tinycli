@@ -49,6 +49,7 @@ int tinycli_result;
 int tokenize(char* str, char* argv[]) {
     int argc = 0;
     argv[argc] = strtok(str, TINYCLI_TOKDELIM);
+    if (argv[argc] == NULL) return 0;
     while (++argc < TINYCLI_MAXARGC && (argv[argc] = strtok(NULL, TINYCLI_TOKDELIM)));
     return argc;
 }

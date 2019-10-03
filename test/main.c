@@ -160,5 +160,16 @@ int main() {
     assert(check_s0 == 0);   /* test check variables */
     assert(check_s1 > 0);
 
+    /* Test no command */
+    check_i0 = -1;            /* init check variable */
+    check_i1 = -1;
+    check_d0 = -1;
+    check_d1 = -1;
+    check_s0 = -1;
+    check_s1 = -1;
+    tinycli_putsn("\n", 1);
+    assert(check_s0 == -1);   /* test check variables */
+    assert(check_s1 == -1);
+
     return 0;
 }
