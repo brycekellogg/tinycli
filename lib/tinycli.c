@@ -64,6 +64,13 @@ int tinycli_stoi(const char* c) {
 /*
  *
  */
+int tinycli_stoll(const char* c) {
+    return strtoll(c, NULL, 0);
+}
+
+/*
+ *
+ */
 double tinycli_stod(const char* c) {
     return strtod(c, NULL);
 }

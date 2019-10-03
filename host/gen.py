@@ -11,8 +11,8 @@
 import re
 from itertools import product
 
-paramsubs = {"v": "void", "i": "int", "d": "double", "s": "const char*"}
-argsubs = {"v": "", "i": "tinycli_stoi(argv[])", "d": "tinycli_stod(argv[])", "s": "tinycli_stos(argv[])"}
+paramsubs = {"v": "void", "i": "int", "d": "double", "s": "const char*", "l": "long long"}
+argsubs = {"v": "", "i": "tinycli_stoi(argv[])", "d": "tinycli_stod(argv[])", "s": "tinycli_stos(argv[])", "l":"tinycli_stoll(argv[])"}
 
 
 def getdefines(s, width):
@@ -49,9 +49,9 @@ def getdefines(s, width):
 
 
 # Build list of signatures to define
-possibleSigs = ['i','d', 's']
+possibleSigs = ['i','d', 's', 'l']
 sigs = ['v']
-for i in range(1,10):
+for i in range(1,7):
     sigs += list(map("".join, product(possibleSigs, repeat=i)))
 
 
