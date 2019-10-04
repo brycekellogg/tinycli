@@ -151,11 +151,13 @@ int main() {
     assert(check_d0 == 123.0);
     assert(check_d1 == 12.0);
     
-    /* Test double,double function */
+    /* Test string function */
     check_i0 = -1;            /* init check variable */
     check_i1 = -1;
     check_d0 = -1;
     check_d1 = -1;
+    check_s0 = -1;
+    check_s1 = -1;
     tinycli_putsn("s helloWorld\n", 13);
     assert(check_s0 == 0);   /* test check variables */
     assert(check_s1 > 0);

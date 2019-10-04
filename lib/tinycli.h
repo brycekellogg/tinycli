@@ -27,6 +27,17 @@
 #define TINYCLI_TOKDELIM  " "
 #endif
 
+/********************************************
+ * Arrow keys, used for editing and history *
+ ********************************************/
+#define TINYCLI_LEFTARROW   "\x1B[D"
+#define TINYCLI_UPARROW     "\x1B[A"
+#define TINYCLI_RIGHTARROW  "\x1B[C"
+#define TINYCLI_DOWNARROW   "\x1B[B"
+
+/***************
+ * Error Codes *
+ ***************/
 #define TINYCLI_ERROR_NOCMD     -1
 #define TINYCLI_ERROR_NUMARGS   -2
 #define TINYCLI_ERROR_NOCALL    -3

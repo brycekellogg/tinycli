@@ -154,6 +154,8 @@
 #define tinycli_args_10(n,i,t, ...) CONCAT(tinycli_sto,t)(argv[(n) - ((i)-1)]), tinycli_args_9(n, i-1,__VA_ARGS__)
 #define tinycli_args(...) CONCAT(tinycli_args_,tinycli_nargs(__VA_ARGS__))(tinycli_nargs(__VA_ARGS__),tinycli_nargs(__VA_ARGS__),__VA_ARGS__)
 
+#define TRUE  1
+#define FALSE 0
 
 /* Return value
  */
@@ -248,6 +250,77 @@ int tinycli_call(int argc, char* argv[]) {
     return TINYCLI_ERROR_NOCMD;
 }
 
+#ifdef TINYCLI_ARROWS
+int tinycli_escape(char c) {
+    static int  escapeCount = 0;
+    /* Line editing using arrow keys */
+    if (c == TINYCLI_ESCAPECODE) {
+        escapeCount++;
+        printf("ESCAPE!!!\n");
+        return;
+    }
+
+    if (escapeCount && c == '[') {
+        escapeCount++;
+        printf("BRACKET!!!\n");
+        return;
+    }
+
+    if (escapeCount == 2 && c == 'D') {
+        escapeCount = 0;
+        printf("LEFT\n");
+        return;
+    }
+
+    printf("%x\n", c);
+
+    //if (escapeCount == 2 && c == 'A') {
+    //    escapeCount = 0;
+    //    printf("UP\n");
+    //    return;
+    //}
+
+    //if (escapeCount == 2 && c == 'C') {
+    //    escapeCount = 0;
+    //    printf("RIGHT\n");
+    //    return;
+    //}
+
+    //if (escapeCount == 2 && c == 'B') {
+    //    escapeCount = 0;
+   //    printf("DOWN\n");
+    //    return;
+    //}
+
+}
+#else
+#define tinycli_escape(_) FALSE
+#endif
+
+#ifdef TINYCLI_BACKSPACE
+int tinycli_backspace(char c) {
+    if (c == '\b') {
+        top--;
+        return TRUE;
+    } else {
+        return FALSE;
+    }
+}
+#else
+#define tinycli_backspace(_) FALSE
+#endif
+
+#ifdef TINYCLI_SKIPCHARS
+int tinycli_skip(char c) {
+    int i;
+    for (i = 0; i < sizeof(TINYCLI_SKIPCHARS); i++) {
+        if (c == TINYCLI_SKIPCHARS[i]) return TRUE;
+    }
+    return FALSE;
+}
+#else
+#define tinycli_skip(_) FALSE
+#endif
 
 /* Add char to tinycli buffer
  *
@@ -264,34 +337,21 @@ void tinycli_putc(char c) {
     static char buffer[TINYCLI_MAXBUFFER];
     static char*  argv[TINYCLI_MAXARGC];
     int argc;
-    int i;
 
-    /* Ignore certain characters */
-    for (i = 0; i < sizeof(TINYCLI_SKIPCHARS); i++) {
-        if (c == TINYCLI_SKIPCHARS[i]) return;
-    }
-
-    /* Handle backspace */
-    if (c == '\b') {
-        top--;
-        return;
-    }
+    /* Process char for optional features */
+    if (tinycli_skip(c))      return;  /* Ignore certain characters */
+    if (tinycli_escape(c))    return;  /* Handle escape sequences */
+    if (tinycli_backspace(c)) return;  /* Handle backspace */
 
     /* Save char */
     buffer[top++] = c;
 
     /* Call stuff */
     if (c == TINYCLI_ENTER) {
-
-        /* Set null character after <enter> */
-        buffer[--top] = '\0';
-
-        /* Parse command into argv and argc */
-        argc = tokenize(buffer, argv);
-
-        /* Try to call function */
-        tinycli_result = tinycli_call(argc, argv);
-        top = 0;
+        buffer[--top] = '\0';           /* Set null character at end of str */
+        argc = tokenize(buffer, argv);  /* Parse command into argv and argc */
+        tinycli_result = tinycli_call(argc, argv);  /* Try to call function */
+        top = 0;                            /* Reset top after each command */
     }
 }
 
