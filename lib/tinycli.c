@@ -29,10 +29,11 @@
  * When adding new types, add an additional
  * tinycli_types_* macro with the chosen
  * type code and the C type that it refers to. **/
-#define tinycli_types_v void
-#define tinycli_types_i int
-#define tinycli_types_d double
-#define tinycli_types_s const char*
+#define tinycli_types_v    void
+#define tinycli_types_i    int
+#define tinycli_types_d    double
+#define tinycli_types_s    const char*
+#define tinycli_types_ll   long long
 
 
 /**
@@ -50,9 +51,10 @@
  * conversion function.
  **/
 #define tinycli_conv_v(n)
-#define tinycli_conv_i(n)   tinycli_stoi(argv[n])
-#define tinycli_conv_d(n)   tinycli_stod(argv[n])
-#define tinycli_conv_s(n)   tinycli_stos(argv[n])
+#define tinycli_conv_i(n)    tinycli_stoi(argv[n])
+#define tinycli_conv_d(n)    tinycli_stod(argv[n])
+#define tinycli_conv_s(n)    tinycli_stos(argv[n])
+#define tinycli_conv_ll(n)   tinycli_stoll(argv[n])
 
 
 /**
@@ -98,10 +100,11 @@
  * When adding new types, copy tinycli_nargs_i and change
  * the type 'i' to the chosen data type code of the new
  * type. No other changes to tinycli_lastarg needed. **/
-#define tinycli_nargs_v(...) 0
-#define tinycli_nargs_i(...) tinycli_lastarg(__VA_ARGS__)
-#define tinycli_nargs_d(...) tinycli_lastarg(__VA_ARGS__)
-#define tinycli_nargs_s(...) tinycli_lastarg(__VA_ARGS__)
+#define tinycli_nargs_v(...)     0
+#define tinycli_nargs_i(...)     tinycli_lastarg(__VA_ARGS__)
+#define tinycli_nargs_d(...)     tinycli_lastarg(__VA_ARGS__)
+#define tinycli_nargs_s(...)     tinycli_lastarg(__VA_ARGS__)
+#define tinycli_nargs_ll(...)    tinycli_lastarg(__VA_ARGS__)
 #define tinycli_lastarg(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, ...) _12
 #define tinycli_nargs(...) CONCAT(tinycli_nargs_,FIRST(__VA_ARGS__))(_, ## __VA_ARGS__, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 
@@ -213,7 +216,7 @@ int tinycli_stoi(const char* c) {
 /*
  *
  */
-int tinycli_stoll(const char* c) {
+long long tinycli_stoll(const char* c) {
     return strtoll(c, NULL, 0);
 }
 
