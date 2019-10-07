@@ -37,27 +37,6 @@
 
 
 /**
- * Data type conversion functions.
- *
- * Each argument passed alongside a command needs to be
- * converted from a string to the desired data type.
- * This is done using various conversion functions,
- * which are specified here in tinycli_conv_*. These
- * macros take a single parameter, which is the index
- * of the argument being passed for conversion.
- *
- * When adding new types, add an additional
- * tinycli_conv_* macro that points to the correct
- * conversion function.
- **/
-#define tinycli_conv_v(n)
-#define tinycli_conv_i(n)    tinycli_stoi(argv[n])
-#define tinycli_conv_d(n)    tinycli_stod(argv[n])
-#define tinycli_conv_s(n)    tinycli_stos(argv[n])
-#define tinycli_conv_ll(n)   tinycli_stoll(argv[n])
-
-
-/**
  * A helper macro for concatenating
  * two tokens together. We need two
  * of them because only with the
@@ -152,18 +131,27 @@
  * The format should match those of existing tincli_args_*
  * macros with just the numbers changed. The macro should call
  * the tinycli_args_* macro with the preceding number. The
- * tinycli_args() macro should remain unchanged.  **/
+ * tinycli_args() macro should remain unchanged.
+ *
+ * Each argument passed alongside a command needs to be
+ * converted from a string to the desired data type.
+ * This is done using various conversion functions,
+ * which are called here as tinycli_sto*.
+ *
+ * When adding new types, make sure the conversion function is named
+ * correctly, such that tinycli_sto* points to the correct
+ * conversion function when passed the type code. **/
 #define tinycli_args_0( n,i,t) 
-#define tinycli_args_1( n,i,t)      CONCAT(tinycli_conv_,t)((n) - ((i)-1))
-#define tinycli_args_2( n,i,t, ...) CONCAT(tinycli_conv_,t)((n) - ((i)-1)), tinycli_args_1(n, i-1,__VA_ARGS__)
-#define tinycli_args_3( n,i,t, ...) CONCAT(tinycli_conv_,t)((n) - ((i)-1)), tinycli_args_2(n, i-1,__VA_ARGS__)
-#define tinycli_args_4( n,i,t, ...) CONCAT(tinycli_conv_,t)((n) - ((i)-1)), tinycli_args_3(n, i-1,__VA_ARGS__)
-#define tinycli_args_5( n,i,t, ...) CONCAT(tinycli_conv_,t)((n) - ((i)-1)), tinycli_args_4(n, i-1,__VA_ARGS__)
-#define tinycli_args_6( n,i,t, ...) CONCAT(tinycli_conv_,t)((n) - ((i)-1)), tinycli_args_5(n, i-1,__VA_ARGS__)
-#define tinycli_args_7( n,i,t, ...) CONCAT(tinycli_conv_,t)((n) - ((i)-1)), tinycli_args_6(n, i-1,__VA_ARGS__)
-#define tinycli_args_8( n,i,t, ...) CONCAT(tinycli_conv_,t)((n) - ((i)-1)), tinycli_args_7(n, i-1,__VA_ARGS__)
-#define tinycli_args_9( n,i,t, ...) CONCAT(tinycli_conv_,t)((n) - ((i)-1)), tinycli_args_8(n, i-1,__VA_ARGS__)
-#define tinycli_args_10(n,i,t, ...) CONCAT(tinycli_conv_,t)((n) - ((i)-1)), tinycli_args_9(n, i-1,__VA_ARGS__)
+#define tinycli_args_1( n,i,t)      CONCAT(tinycli_sto,t)(argv[(n) - ((i)-1)])
+#define tinycli_args_2( n,i,t, ...) CONCAT(tinycli_sto,t)(argv[(n) - ((i)-1)]), tinycli_args_1(n, i-1,__VA_ARGS__)
+#define tinycli_args_3( n,i,t, ...) CONCAT(tinycli_sto,t)(argv[(n) - ((i)-1)]), tinycli_args_2(n, i-1,__VA_ARGS__)
+#define tinycli_args_4( n,i,t, ...) CONCAT(tinycli_sto,t)(argv[(n) - ((i)-1)]), tinycli_args_3(n, i-1,__VA_ARGS__)
+#define tinycli_args_5( n,i,t, ...) CONCAT(tinycli_sto,t)(argv[(n) - ((i)-1)]), tinycli_args_4(n, i-1,__VA_ARGS__)
+#define tinycli_args_6( n,i,t, ...) CONCAT(tinycli_sto,t)(argv[(n) - ((i)-1)]), tinycli_args_5(n, i-1,__VA_ARGS__)
+#define tinycli_args_7( n,i,t, ...) CONCAT(tinycli_sto,t)(argv[(n) - ((i)-1)]), tinycli_args_6(n, i-1,__VA_ARGS__)
+#define tinycli_args_8( n,i,t, ...) CONCAT(tinycli_sto,t)(argv[(n) - ((i)-1)]), tinycli_args_7(n, i-1,__VA_ARGS__)
+#define tinycli_args_9( n,i,t, ...) CONCAT(tinycli_sto,t)(argv[(n) - ((i)-1)]), tinycli_args_8(n, i-1,__VA_ARGS__)
+#define tinycli_args_10(n,i,t, ...) CONCAT(tinycli_sto,t)(argv[(n) - ((i)-1)]), tinycli_args_9(n, i-1,__VA_ARGS__)
 #define tinycli_args(...) CONCAT(tinycli_args_,tinycli_nargs(__VA_ARGS__))(tinycli_nargs(__VA_ARGS__),tinycli_nargs(__VA_ARGS__),__VA_ARGS__)
 
 
