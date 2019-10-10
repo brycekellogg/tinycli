@@ -297,30 +297,7 @@ int tinycli_escape(char c) {
 #define tinycli_escape(_) FALSE
 #endif
 
-#ifdef TINYCLI_BACKSPACE
-int tinycli_backspace(char c) {
-    if (c == '\b') {
-        top--;
-        return TRUE;
-    } else {
-        return FALSE;
-    }
-}
-#else
-#define tinycli_backspace(_) FALSE
-#endif
 
-#ifdef TINYCLI_SKIPCHARS
-int tinycli_skip(char c) {
-    int i;
-    for (i = 0; i < sizeof(TINYCLI_SKIPCHARS); i++) {
-        if (c == TINYCLI_SKIPCHARS[i]) return TRUE;
-    }
-    return FALSE;
-}
-#else
-#define tinycli_skip(_) FALSE
-#endif
 
 /* Add char to tinycli buffer
  *
@@ -338,10 +315,24 @@ void tinycli_putc(char c) {
     static char*  argv[TINYCLI_MAXARGC];
     int argc;
 
-    /* Process char for optional features */
-    if (tinycli_skip(c))      return;  /* Ignore certain characters */
-    if (tinycli_escape(c))    return;  /* Handle escape sequences */
-    if (tinycli_backspace(c)) return;  /* Handle backspace */
+
+    // Ignore certain characters
+#ifdef TINYCLI_SKIPCHARS
+    for (int i = 0; i < sizeof(TINYCLI_SKIPCHARS); i++) {
+        if (c == TINYCLI_SKIPCHARS[i]) return;
+    }
+#endif  // TINYCLI_SKIPCHARS
+
+    // Handle backspace
+#ifdef TINYCLI_BACKSPACE
+    if (c == '\b') {
+        top--;
+#ifdef TINYCLI_ECHO
+        // TODO: update echo
+#endif // TINYCLI_ECHO
+        return;
+    }
+#endif // TINYCLI_BACKSPACE
 
     /* Save char */
     buffer[top++] = c;
