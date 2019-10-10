@@ -30,10 +30,12 @@
 /********************************************
  * Arrow keys, used for editing and history *
  ********************************************/
-#define TINYCLI_LEFTARROW   "\x1B[D"
-#define TINYCLI_UPARROW     "\x1B[A"
-#define TINYCLI_RIGHTARROW  "\x1B[C"
-#define TINYCLI_DOWNARROW   "\x1B[B"
+#define TINYCLI_ARROWS
+#define TINYCLI_ESCAPECHARS "\x1B["
+#define TINYCLI_LEFTARROW   'D'
+#define TINYCLI_UPARROW     'A'
+#define TINYCLI_RIGHTARROW  'C'
+#define TINYCLI_DOWNARROW   'B'
 
 /***************
  * Error Codes *

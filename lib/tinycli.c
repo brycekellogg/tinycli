@@ -11,6 +11,7 @@
  */
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "tinycli.h"
 
@@ -250,53 +251,6 @@ int tinycli_call(int argc, char* argv[]) {
     return TINYCLI_ERROR_NOCMD;
 }
 
-#ifdef TINYCLI_ARROWS
-int tinycli_escape(char c) {
-    static int  escapeCount = 0;
-    /* Line editing using arrow keys */
-    if (c == TINYCLI_ESCAPECODE) {
-        escapeCount++;
-        printf("ESCAPE!!!\n");
-        return;
-    }
-
-    if (escapeCount && c == '[') {
-        escapeCount++;
-        printf("BRACKET!!!\n");
-        return;
-    }
-
-    if (escapeCount == 2 && c == 'D') {
-        escapeCount = 0;
-        printf("LEFT\n");
-        return;
-    }
-
-    printf("%x\n", c);
-
-    //if (escapeCount == 2 && c == 'A') {
-    //    escapeCount = 0;
-    //    printf("UP\n");
-    //    return;
-    //}
-
-    //if (escapeCount == 2 && c == 'C') {
-    //    escapeCount = 0;
-    //    printf("RIGHT\n");
-    //    return;
-    //}
-
-    //if (escapeCount == 2 && c == 'B') {
-    //    escapeCount = 0;
-   //    printf("DOWN\n");
-    //    return;
-    //}
-
-}
-#else
-#define tinycli_escape(_) FALSE
-#endif
-
 
 
 /* Add char to tinycli buffer
@@ -311,6 +265,7 @@ int tinycli_escape(char c) {
 void tinycli_putc(char c) {
 
     static int  top = 0;
+    static int escCnt = 0;
     static char buffer[TINYCLI_MAXBUFFER];
     static char*  argv[TINYCLI_MAXARGC];
     int argc;
@@ -323,6 +278,25 @@ void tinycli_putc(char c) {
     }
 #endif  // TINYCLI_SKIPCHARS
 
+
+
+#ifdef TINYCLI_ARROWS
+    if (escCnt < sizeof(TINYCLI_ESCAPECHARS) && c == TINYCLI_ESCAPECHARS[escCnt]) {
+        escCnt++;
+    } else if (escCnt == sizeof(TINYCLI_ESCAPECHARS)-1) {
+        escCnt = 0;
+        switch(c) {
+            case TINYCLI_LEFTARROW:  printf("L"); break;
+            case TINYCLI_RIGHTARROW: printf("R"); break;
+            case TINYCLI_UPARROW:    printf("U"); break;
+            case TINYCLI_DOWNARROW:  printf("D"); break;
+        }
+    }
+
+
+#endif  // TINYCLI_ARROWS
+
+
     // Handle backspace
 #ifdef TINYCLI_BACKSPACE
     if (c == '\b') {
@@ -333,6 +307,8 @@ void tinycli_putc(char c) {
         return;
     }
 #endif // TINYCLI_BACKSPACE
+
+
 
     /* Save char */
     buffer[top++] = c;
