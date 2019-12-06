@@ -27,6 +27,16 @@
 #define TINYCLI_TOKDELIM  " "
 #endif
 
+#define TINYCLI_ECHO
+#define TINYCLI_BACKSPACE '\x7f'
+
+#ifdef TINYCLI_ECHO
+#define tinycli_echoc(c)  putchar(c)
+#define tinycli_echos(s)  fputs(s, stdout)
+#else
+#define tinycli_echoc(c)
+#define tinycli_echos(s)
+#endif
 /********************************************
  * Arrow keys, used for editing and history *
  ********************************************/
@@ -36,6 +46,9 @@
 #define TINYCLI_UPARROW     'A'
 #define TINYCLI_RIGHTARROW  'C'
 #define TINYCLI_DOWNARROW   'B'
+
+#define TINYCLI_CURSORFORWARD   "\033[1C"
+#define TINYCLI_CURSORBACKWARD  "\033[1D"
 
 /***************
  * Error Codes *

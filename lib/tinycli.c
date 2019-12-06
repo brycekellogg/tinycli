@@ -253,11 +253,20 @@ int tinycli_call(int argc, char* argv[]) {
 
 
 
-/* Add char to tinycli buffer
+/* Add char to tinycli buffer & potentially trigger command.
  *
- * Will trigger a command if the
- * char matches the TINYCLI_ENTER
- * character.
+ * Unless the input char `c` matches one of the special characters described
+ * below, it is appended to a command buffer. This command buffer is then
+ * compared against the command string specified in `tinycli_register()`
+ *
+ * `TINYCLI_ENTER`: indicates that an enter or return code has been sent and
+ *                  that this is the end of a command string. Tinycli will
+ *                  attempt tokenization and calling a command.
+ *
+ * `TINYCLI_BACKSPACE`:
+ * `TINYCLI_SKIPCHARS`:
+ * `TINYCLI_ESCAPECHARS`:
+ * `TiNYCLI_*ARROW`:
  *
  * Params:
  *     c = the character to append
@@ -265,7 +274,6 @@ int tinycli_call(int argc, char* argv[]) {
 void tinycli_putc(char c) {
 
     static int  top = 0;
-    static int escCnt = 0;
     static char buffer[TINYCLI_MAXBUFFER];
     static char*  argv[TINYCLI_MAXARGC];
     int argc;
@@ -279,46 +287,46 @@ void tinycli_putc(char c) {
 #endif  // TINYCLI_SKIPCHARS
 
 
-
 #ifdef TINYCLI_ARROWS
+    static int escCnt = 0;
     if (escCnt < sizeof(TINYCLI_ESCAPECHARS) && c == TINYCLI_ESCAPECHARS[escCnt]) {
         escCnt++;
     } else if (escCnt == sizeof(TINYCLI_ESCAPECHARS)-1) {
         escCnt = 0;
         switch(c) {
-            case TINYCLI_LEFTARROW:  printf("L"); break;
-            case TINYCLI_RIGHTARROW: printf("R"); break;
-            case TINYCLI_UPARROW:    printf("U"); break;
-            case TINYCLI_DOWNARROW:  printf("D"); break;
+            case TINYCLI_LEFTARROW:  tinycli_echos(TINYCLI_CURSORBACKWARD); return;
+            case TINYCLI_RIGHTARROW: tinycli_echos(TINYCLI_CURSORFORWARD);  return;
+            case TINYCLI_UPARROW:    return;
+            case TINYCLI_DOWNARROW:  return;
         }
     }
-
-
 #endif  // TINYCLI_ARROWS
 
 
     // Handle backspace
 #ifdef TINYCLI_BACKSPACE
-    if (c == '\b') {
+    if (c == TINYCLI_BACKSPACE) {
         top--;
-#ifdef TINYCLI_ECHO
-        // TODO: update echo
-#endif // TINYCLI_ECHO
+        tinycli_echos(TINYCLI_CURSORBACKWARD);
+        tinycli_echoc(' ');
+        tinycli_echos(TINYCLI_CURSORBACKWARD);
         return;
     }
 #endif // TINYCLI_BACKSPACE
 
 
-
-    /* Save char */
-    buffer[top++] = c;
-
-    /* Call stuff */
+    // Save c to buffer & potentially call function
     if (c == TINYCLI_ENTER) {
-        buffer[--top] = '\0';           /* Set null character at end of str */
-        argc = tokenize(buffer, argv);  /* Parse command into argv and argc */
-        tinycli_result = tinycli_call(argc, argv);  /* Try to call function */
-        top = 0;                            /* Reset top after each command */
+        buffer[top] = '\0';     // Set null character at end of str
+        top = 0;                // Reset top after each command
+        tinycli_echos("\r\n");  // Echo to complete line
+
+        argc = tokenize(buffer, argv);              // Parse command into argv and argc
+        tinycli_result = tinycli_call(argc, argv);  // Try to call function
+    } else {
+        // Save and echo char
+        buffer[top++] = c;
+        tinycli_echoc(c);
     }
 }
 
