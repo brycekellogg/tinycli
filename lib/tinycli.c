@@ -188,7 +188,7 @@ int tinycli_result;
  *   In the case that str contains more tokens than MAX_ARGC, then only
  *   the first MAX_ARGC number will be copied into argv.
  */
-int tokenize(char* str, char* argv[]) {
+int tinycli_tokenize(char* str, char* argv[]) {
     int argc = 0;
     argv[argc] = strtok(str, TINYCLI_TOKDELIM);
     if (argv[argc] == NULL) return 0;
@@ -321,7 +321,7 @@ void tinycli_putc(char c) {
         top = 0;                // Reset top after each command
         tinycli_echos("\r\n");  // Echo to complete line
 
-        argc = tokenize(buffer, argv);              // Parse command into argv and argc
+        argc = tinycli_tokenize(buffer, argv);      // Parse command into argv and argc
         tinycli_result = tinycli_call(argc, argv);  // Try to call function
     } else {
         // Save and echo char
