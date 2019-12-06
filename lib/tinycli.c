@@ -155,12 +155,11 @@
 #define tinycli_args_10(n,i,t, ...) CONCAT(tinycli_sto,t)(argv[(n) - ((i)-1)]), tinycli_args_9(n, i-1,__VA_ARGS__)
 #define tinycli_args(...) CONCAT(tinycli_args_,tinycli_nargs(__VA_ARGS__))(tinycli_nargs(__VA_ARGS__),tinycli_nargs(__VA_ARGS__),__VA_ARGS__)
 
-#define TRUE  1
-#define FALSE 0
 
 /* Return value
  */
 int tinycli_result;
+
 
 /* Declare functions
  *
@@ -170,6 +169,7 @@ int tinycli_result;
 #define tinycli_register(txt, fun, ...) int fun(tinycli_params(__VA_ARGS__));
 #include "tinycli-funs.h"
 #undef tinycli_register
+
 
 /*
  * Tokenize a string into argc/argv format
