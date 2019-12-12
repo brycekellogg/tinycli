@@ -16,11 +16,11 @@
 #define TINYCLI_MAXBUFFER  100
 
 #ifndef TINYCLI_ENTER
-#define TINYCLI_ENTER  '\n'
+#define TINYCLI_ENTER  '\r'
 #endif
 
 #ifndef TINYCLI_SKIPCHARS
-#define TINYCLI_SKIPCHARS  "\r\t"
+#define TINYCLI_SKIPCHARS  "\n\t"
 #endif
 
 #ifndef TINYCLI_TOKDELIM
