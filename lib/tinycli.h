@@ -9,8 +9,8 @@
  * Copyright: 2019 Bryce Kellogg
  * License: BSD 3-Clause
  */
-#ifndef __TINYCLI_H__
-#define __TINYCLI_H__
+#ifndef _TINYCLI_H_
+#define _TINYCLI_H_
 
 #define TINYCLI_MAXARGC    10
 #define TINYCLI_MAXBUFFER  100
@@ -44,4 +44,4 @@ void tinycli_putc(char c);
 }
 #endif
 
-#endif /* __TINYCLI_H__ */
+#endif /* _TINYCLI_H_ */
