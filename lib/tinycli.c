@@ -274,6 +274,7 @@ int tinycli_call(int argc, char* argv[]) {
 void tinycli_putc(char c) {
 
     static int  top = 0;
+    static int  cur = 0;
     static char buffer[TINYCLI_MAXBUFFER];
     static char*  argv[TINYCLI_MAXARGC];
     int argc;
@@ -295,8 +296,14 @@ void tinycli_putc(char c) {
     } else if (escCnt == sizeof(TINYCLI_ESCAPECHARS)-1) {
         escCnt = 0;
         switch(c) {
-            case TINYCLI_LEFTARROW:  tinycli_echos(TINYCLI_CURSORBACKWARD); return;
-            case TINYCLI_RIGHTARROW: tinycli_echos(TINYCLI_CURSORFORWARD);  return;
+            case TINYCLI_LEFTARROW:
+                cur = (cur > 0) ? cur-1 : 0;
+                tinycli_echos(TINYCLI_CURSORBACKWARD);
+                return;
+            case TINYCLI_RIGHTARROW:
+                cur = (cur < top) ? cur+1 : top;
+                tinycli_echos(TINYCLI_CURSORFORWARD);
+                return;
             case TINYCLI_UPARROW:    return;
             case TINYCLI_DOWNARROW:  return;
             default: return;
@@ -308,10 +315,23 @@ void tinycli_putc(char c) {
     // Handle backspace
 #ifdef TINYCLI_BACKSPACE
     if (c == TINYCLI_BACKSPACE) {
+
+        // Delete character by shifting buffer left one.
+        // Update cur and top given deleted character.
+        for (int i = cur-1; i < top-1; i++) {
+            buffer[i] = buffer[i+1];
+        }
+        cur--;
         top--;
+
+        // Move cursor back one, print remaining buffer, erase
+        // last character, and reset cursor to correct position.
         tinycli_echos(TINYCLI_CURSORBACKWARD);
+        tinycli_echosn(buffer+cur, top-cur);
         tinycli_echoc(' ');
-        tinycli_echos(TINYCLI_CURSORBACKWARD);
+        for (int i = top; i >= cur; i--) tinycli_echos(TINYCLI_CURSORBACKWARD);
+
+        // Nothing to save to the buffer
         return;
     }
 #endif // TINYCLI_BACKSPACE
@@ -321,14 +341,25 @@ void tinycli_putc(char c) {
     if (c == TINYCLI_ENTER) {
         buffer[top] = '\0';     // Set null character at end of str
         top = 0;                // Reset top after each command
+        cur = 0;
         tinycli_echos("\r\n");  // Echo to complete line
 
         argc = tinycli_tokenize(buffer, argv);      // Parse command into argv and argc
         tinycli_result = tinycli_call(argc, argv);  // Try to call function
     } else {
-        // Save and echo char
-        buffer[top++] = c;
+        // Insert character by shifting buffer right one,
+        // and saving char to the newly open index.
+        for (int i = top; i > cur; i--) {
+            buffer[i] = buffer[i-1];
+        }
+        buffer[cur++] = c;
+        top++;
+
+        // Echo character, print remaining buffer,
+        // and reset cursor to correct position.
         tinycli_echoc(c);
+        tinycli_echosn(buffer+cur, top-cur);
+        for (int i = top; i > cur; i--) tinycli_echos(TINYCLI_CURSORBACKWARD);
     }
 }
 

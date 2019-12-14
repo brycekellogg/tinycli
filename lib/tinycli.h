@@ -31,8 +31,9 @@
 #define TINYCLI_BACKSPACE '\x7f'
 
 #ifdef TINYCLI_ECHO
-#define tinycli_echoc(c)  putchar(c)
-#define tinycli_echos(s)  fputs(s, stdout)
+#define tinycli_echoc(c)     putchar(c)
+#define tinycli_echos(s)     fputs(s, stdout)
+#define tinycli_echosn(s, n) fwrite(s, 1, n, stdout)
 #else
 #define tinycli_echoc(c)
 #define tinycli_echos(s)
