@@ -291,6 +291,7 @@ void tinycli_putc(char c) {
     static int escCnt = 0;
     if (escCnt < sizeof(TINYCLI_ESCAPECHARS) && c == TINYCLI_ESCAPECHARS[escCnt]) {
         escCnt++;
+        return;
     } else if (escCnt == sizeof(TINYCLI_ESCAPECHARS)-1) {
         escCnt = 0;
         switch(c) {
@@ -298,6 +299,7 @@ void tinycli_putc(char c) {
             case TINYCLI_RIGHTARROW: tinycli_echos(TINYCLI_CURSORFORWARD);  return;
             case TINYCLI_UPARROW:    return;
             case TINYCLI_DOWNARROW:  return;
+            default: return;
         }
     }
 #endif  // TINYCLI_ARROWS
