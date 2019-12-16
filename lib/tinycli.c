@@ -307,11 +307,9 @@ void tinycli_putc(char c) {
         escCnt++;
         return;
     }
-#endif  // TINYCLI_ENABLE_EDITING
 
 
     // Handle backspace
-#ifdef TINYCLI_ENABLE_EDITING
     if (c == TINYCLI_BACKSPACE) {
 
         // Delete character by shifting buffer left one.
@@ -332,7 +330,7 @@ void tinycli_putc(char c) {
         // Nothing to save to the buffer
         return;
     }
-#endif // TINYCLI_BACKSPACE
+#endif  // TINYCLI_ENABLE_EDITING
 
 
     // Save c to buffer & potentially call function
