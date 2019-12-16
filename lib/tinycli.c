@@ -281,39 +281,37 @@ void tinycli_putc(char c) {
 
 
     // Ignore certain characters
-#ifdef TINYCLI_SKIPCHARS
     for (int i = 0; i < sizeof(TINYCLI_SKIPCHARS); i++) {
         if (c == TINYCLI_SKIPCHARS[i]) return;
     }
-#endif  // TINYCLI_SKIPCHARS
 
 
-#ifdef TINYCLI_ARROWS
+#ifdef TINYCLI_ENABLE_EDITING
     static int escCnt = 0;
-    if (escCnt < sizeof(TINYCLI_ESCAPECHARS) && c == TINYCLI_ESCAPECHARS[escCnt]) {
+    if (escCnt == sizeof(TINYCLI_LEFTARROW)-2 && c == TINYCLI_LEFTARROW[escCnt]) {
+        escCnt = 0;
+        cur = (cur > 0) ? cur-1 : 0;
+        tinycli_echos(TINYCLI_CURSORBACKWARD);
+        return;
+    }
+
+    if (escCnt == sizeof(TINYCLI_RIGHTARROW)-2 && c == TINYCLI_RIGHTARROW[escCnt]) {
+        escCnt = 0;
+        cur = (cur < top) ? cur+1 : top;
+        tinycli_echos(TINYCLI_CURSORFORWARD);
+        return;
+    }
+
+    if (escCnt < sizeof(TINYCLI_LEFTARROW)  && c == TINYCLI_LEFTARROW[escCnt] ||
+        escCnt < sizeof(TINYCLI_RIGHTARROW) && c == TINYCLI_RIGHTARROW[escCnt]) {
         escCnt++;
         return;
-    } else if (escCnt == sizeof(TINYCLI_ESCAPECHARS)-1) {
-        escCnt = 0;
-        switch(c) {
-            case TINYCLI_LEFTARROW:
-                cur = (cur > 0) ? cur-1 : 0;
-                tinycli_echos(TINYCLI_CURSORBACKWARD);
-                return;
-            case TINYCLI_RIGHTARROW:
-                cur = (cur < top) ? cur+1 : top;
-                tinycli_echos(TINYCLI_CURSORFORWARD);
-                return;
-            case TINYCLI_UPARROW:    return;
-            case TINYCLI_DOWNARROW:  return;
-            default: return;
-        }
     }
-#endif  // TINYCLI_ARROWS
+#endif  // TINYCLI_ENABLE_EDITING
 
 
     // Handle backspace
-#ifdef TINYCLI_BACKSPACE
+#ifdef TINYCLI_ENABLE_EDITING
     if (c == TINYCLI_BACKSPACE) {
 
         // Delete character by shifting buffer left one.

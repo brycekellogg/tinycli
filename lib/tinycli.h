@@ -14,8 +14,8 @@
 #define _TINYCLI_H_
 
 
-//#define TINYCLI_ENABLE_ECHO
-//#define TINYCLI_ENABLE_EDITING
+#define TINYCLI_ENABLE_ECHO
+#define TINYCLI_ENABLE_EDITING
 //#define TINYCLI_ENABLE_HISTORY
 
 
@@ -88,38 +88,56 @@
 #define tinycli_echosn(s, n)
 #endif
 
-/********************************************
- * Arrow keys, used for editing and history *
- ********************************************/
 
-
-#ifndef TINYCLI_ESCAPECHARS
-#define TINYCLI_ESCAPECHARS  "\x1B["
-#endif
-
+/* Configure sequence of characters that correspond to
+ * a left arrow key code. This is only used when line
+ * editing is enabled. It moves the cursor and buffer
+ * insert position one character to the left.  */
 #ifndef TINYCLI_LEFTARROW
-#define TINYCLI_LEFTARROW  'D'
+#define TINYCLI_LEFTARROW  "\x1B[D"
 #endif
 
-#ifndef TINYCLI_UPARROW
-#define TINYCLI_UPARROW  'A'
-#endif
 
+/* Configure sequence of characters that correspond to
+ * a right arrow key code. This is only used when line
+ * editing is enabled. It moves the cursor and buffer
+ * insert position one character to the right.  */
 #ifndef TINYCLI_RIGHTARROW
-#define TINYCLI_RIGHTARROW  'C'
+#define TINYCLI_RIGHTARROW  "\x1B[C"
 #endif
 
+
+/* Configure sequence of characters that correspond to
+ * an up arrow key code. This is only used when command
+ * history is enabled. Currently unimplemented  */
+#ifndef TINYCLI_UPARROW
+#define TINYCLI_UPARROW  "\x1B[A"
+#endif
+
+
+/* Configure sequence of characters that correspond to
+ * a down arrow key code. This is only used when command
+ * history is enabled. Currently unimplemented  */
 #ifndef TINYCLI_DOWNARROW
-#define TINYCLI_DOWNARROW  'B'
+#define TINYCLI_DOWNARROW  "\x1B[B"
 #endif
 
+
+/* Configure sequence of characters that controls movement
+ * of the cursor. This key code will instruct the terminal
+ * to move the cursor forward one character.  */
 #ifndef TINYCLI_CURSORFORWARD
 #define TINYCLI_CURSORFORWARD   "\033[1C"
 #endif
 
+
+/* Configure sequence of characters that controls movement
+ * of the cursor. This key code will instruct the terminal
+ * to move the cursor back one character.  */
 #ifndef TINYCLI_CURSORBACKWARD
 #define TINYCLI_CURSORBACKWARD  "\033[1D"
 #endif
+
 
 /***************
  * Error Codes *
