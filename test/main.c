@@ -62,7 +62,7 @@ int main() {
     check_i1 = -1;
     check_d0 = -1;
     check_d1 = -1;
-    tinycli_putsn("v\n", 2);        /* write command string */
+    tinycli_putsn("v\r", 2);        /* write command string */
     assert(tinycli_result == 1);
     assert(check_i0 == 0);    /* test check variables */
     assert(check_i1 == -1);
@@ -75,7 +75,7 @@ int main() {
     check_i1 = -1;
     check_d0 = -1;
     check_d1 = -1;
-    tinycli_putsn("i 13\n", 5);     /* write command string */
+    tinycli_putsn("i 13\r", 5);     /* write command string */
     assert(check_i0 == 13);   /* test check variables */
     assert(check_i1 == -1);
     assert(check_d0 == -1);
@@ -87,7 +87,7 @@ int main() {
     check_i1 = -1;
     check_d0 = -1;
     check_d1 = -1;
-    tinycli_putsn("i 0x13\n", 7);   /* write command string */
+    tinycli_putsn("i 0x13\r", 7);   /* write command string */
     assert(check_i0 == 0x13); /* test check variables */
     assert(check_i1 == -1);
     assert(check_d0 == -1);
@@ -99,7 +99,7 @@ int main() {
     check_i1 = -1;
     check_d0 = -1;
     check_d1 = -1;
-    tinycli_putsn("d 1.3\n", 6);    /* write command string */
+    tinycli_putsn("d 1.3\r", 6);    /* write command string */
     assert(check_i0 == -1);   /* test check variables */
     assert(check_i1 == -1);
     assert(check_d0 == 1.3);
@@ -111,7 +111,7 @@ int main() {
     check_i1 = -1;
     check_d0 = -1;
     check_d1 = -1;
-    tinycli_putsn("ii 12 -5\n", 9); /* write command string */
+    tinycli_putsn("ii 12 -5\r", 9); /* write command string */
     assert(check_i0 == 12);   /* test check variables */
     assert(check_i1 == -5);
     assert(check_d0 == -1);
@@ -123,7 +123,7 @@ int main() {
     check_i1 = -1;
     check_d0 = -1;
     check_d1 = -1;
-    tinycli_putsn("id 12 -0.123\n", 13);
+    tinycli_putsn("id 12 -0.123\r", 13);
     assert(check_i0 == 12);   /* test check variables */
     assert(check_i1 == -1);
     assert(check_d0 == -1);
@@ -134,7 +134,7 @@ int main() {
     check_i1 = -1;
     check_d0 = -1;
     check_d1 = -1;
-    tinycli_putsn("di 123.0 12\n", 12);
+    tinycli_putsn("di 123.0 12\r", 12);
     assert(check_i0 == -1);   /* test check variables */
     assert(check_i1 == 12);
     assert(check_d0 == 123.0);
@@ -145,7 +145,7 @@ int main() {
     check_i1 = -1;
     check_d0 = -1;
     check_d1 = -1;
-    tinycli_putsn("dd 123.0 12\n", 12);
+    tinycli_putsn("dd 123.0 12\r", 12);
     assert(check_i0 == -1);   /* test check variables */
     assert(check_i1 == -1);
     assert(check_d0 == 123.0);
@@ -158,7 +158,7 @@ int main() {
     check_d1 = -1;
     check_s0 = -1;
     check_s1 = -1;
-    tinycli_putsn("s helloWorld\n", 13);
+    tinycli_putsn("s helloWorld\r", 13);
     assert(check_s0 == 0);   /* test check variables */
     assert(check_s1 > 0);
 
@@ -169,7 +169,7 @@ int main() {
     check_d1 = -1;
     check_s0 = -1;
     check_s1 = -1;
-    tinycli_putsn("\n", 1);
+    tinycli_putsn("\r", 1);
     assert(check_s0 == -1);   /* test check variables */
     assert(check_s1 == -1);
 
