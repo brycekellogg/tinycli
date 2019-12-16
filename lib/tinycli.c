@@ -192,7 +192,7 @@ int tinycli_tokenize(char* str, char* argv[]) {
     int argc = 0;
     argv[argc] = strtok(str, TINYCLI_TOKDELIM);
     if (argv[argc] == NULL) return 0;
-    while (++argc < TINYCLI_MAXARGC && (argv[argc] = strtok(NULL, TINYCLI_TOKDELIM)));
+    while (++argc <= TINYCLI_MAXARGS && (argv[argc] = strtok(NULL, TINYCLI_TOKDELIM)));
     return argc;
 }
 
@@ -275,8 +275,8 @@ void tinycli_putc(char c) {
 
     static int  top = 0;
     static int  cur = 0;
-    static char buffer[TINYCLI_MAXBUFFER];
-    static char*  argv[TINYCLI_MAXARGC];
+    static char buffer[TINYCLI_MAXBUFFER];  // TODO: check this in putc
+    static char*  argv[TINYCLI_MAXARGS+1];
     int argc;
 
 
