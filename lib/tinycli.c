@@ -280,33 +280,42 @@ void tinycli_putc(char c) {
     int argc;
 
 
-    // Ignore certain characters
+    // Ignore any characters in the TINYCLI_SKIPCHARS macro
     for (int i = 0; i < sizeof(TINYCLI_SKIPCHARS); i++) {
         if (c == TINYCLI_SKIPCHARS[i]) return;
     }
 
 
 #ifdef TINYCLI_ENABLE_EDITING
-    static int escCnt = 0;
-    if (escCnt == sizeof(TINYCLI_LEFTARROW)-2 && c == TINYCLI_LEFTARROW[escCnt]) {
-        escCnt = 0;
+
+    // Test if we have matched the escape sequence for a left arrow key code.
+    // If so, we reset the escape sequence counter, move the buffer cursor,
+    // and echo a cursor backward escape sequence. Nothing is added to the buffer.
+    static int escCntLeft = 0;
+    if (escCntLeft < sizeof(TINYCLI_LEFTARROW) && c != TINYCLI_LEFTARROW[escCntLeft]) escCntLeft = 0;
+    if (escCntLeft < sizeof(TINYCLI_LEFTARROW) && c == TINYCLI_LEFTARROW[escCntLeft]) escCntLeft++;
+    if (escCntLeft == sizeof(TINYCLI_LEFTARROW)-1) {
+        escCntLeft = 0;
         cur = (cur > 0) ? cur-1 : 0;
         tinycli_echos(TINYCLI_CURSORBACKWARD);
         return;
     }
 
-    if (escCnt == sizeof(TINYCLI_RIGHTARROW)-2 && c == TINYCLI_RIGHTARROW[escCnt]) {
-        escCnt = 0;
+    // Test if we have matched the escape sequence for a right arrow key code.
+    // If so, we reset the escape sequence counter, move the buffer cursor,
+    // and echo a cursor forward escape sequence. Nothing is added to the buffer.
+    static int escCntRight = 0;
+    if (escCntRight < sizeof(TINYCLI_RIGHTARROW) && c != TINYCLI_RIGHTARROW[escCntRight]) escCntRight = 0;
+    if (escCntRight < sizeof(TINYCLI_RIGHTARROW) && c == TINYCLI_RIGHTARROW[escCntRight]) escCntRight++;
+    if (escCntRight == sizeof(TINYCLI_RIGHTARROW)-1) {
+        escCntRight = 0;
         cur = (cur < top) ? cur+1 : top;
         tinycli_echos(TINYCLI_CURSORFORWARD);
         return;
     }
 
-    if ((escCnt < sizeof(TINYCLI_LEFTARROW)  && c == TINYCLI_LEFTARROW[escCnt]) ||
-        (escCnt < sizeof(TINYCLI_RIGHTARROW) && c == TINYCLI_RIGHTARROW[escCnt])) {
-        escCnt++;
-        return;
-    }
+    // Don't add escape sequences to the buffer
+    if (escCntLeft != 0 || escCntRight != 0) return;
 
 
     // Handle backspace
