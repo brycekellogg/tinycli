@@ -302,8 +302,8 @@ void tinycli_putc(char c) {
         return;
     }
 
-    if (escCnt < sizeof(TINYCLI_LEFTARROW)  && c == TINYCLI_LEFTARROW[escCnt] ||
-        escCnt < sizeof(TINYCLI_RIGHTARROW) && c == TINYCLI_RIGHTARROW[escCnt]) {
+    if ((escCnt < sizeof(TINYCLI_LEFTARROW)  && c == TINYCLI_LEFTARROW[escCnt]) ||
+        (escCnt < sizeof(TINYCLI_RIGHTARROW) && c == TINYCLI_RIGHTARROW[escCnt])) {
         escCnt++;
         return;
     }
