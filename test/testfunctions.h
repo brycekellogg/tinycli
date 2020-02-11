@@ -1,3 +1,19 @@
+/*  _______ _____ _   ___     _______ _      _____
+ * |__   __|_   _| \ | \ \   / / ____| |    |_   _|
+ *    | |    | | |  \| |\ \_/ / |    | |      | |
+ *    | |    | | | . ` | \   /| |    | |      | |
+ *    | |   _| |_| |\  |  | | | |____| |____ _| |_
+ *    |_|  |_____|_| \_|  |_|  \_____|______|_____|
+ *
+ * Author: Bryce Kellogg (bryce@kellogg.org)
+ * Copyright: 2019 Bryce Kellogg
+ * License: BSD 3-Clause
+ */
+#include "tinycli.h"
+
+extern int    argsInt[TINYCLI_MAXARGS];
+extern char   argsStr[TINYCLI_MAXARGS][TINYCLI_MAXBUFFER];
+extern double argsDouble[TINYCLI_MAXARGS];
 
 int f_v(void) {
     return 1;
