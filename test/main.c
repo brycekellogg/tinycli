@@ -18,38 +18,42 @@ typedef struct {
 int    argsInt[TINYCLI_MAXARGS];
 char   argsStr[TINYCLI_MAXARGS][TINYCLI_MAXBUFFER];
 double argsDouble[TINYCLI_MAXARGS];
+char   echoStr[TINYCLI_MAXBUFFER];
+int    echoTop;
 
-#include "testcases.h"
+#include TEST_HEADER
 #include "testfunctions.h"
 
+void test_echoc(char c) {
+    echoStr[echoTop++] = c;
+}
+
+void test_echos(char* s) {
+    strcpy(echoStr+echoTop,s);
+    echoTop += strlen(s);
+}
+
+void test_echosn(char* s, int n) {
+    strncpy(echoStr+echoTop, s, n);
+    int len = strlen(s);
+    echoTop += (len <= n) ? len : n;
+}
+
+
 void runTest(testcase t) {
-    for (int i = 0; i < TINYCLI_MAXARGS; i++) {
-        argsInt[i] = 0;
-    }
+    memset(argsInt,    0, TINYCLI_MAXARGS*sizeof(int));
+    memset(argsDouble, 0, TINYCLI_MAXARGS*sizeof(double));
+    memset(argsStr,    0, TINYCLI_MAXARGS*TINYCLI_MAXBUFFER*sizeof(char));
+    memset(echoStr,    0, TINYCLI_MAXBUFFER*sizeof(char));
+    echoTop = 0;
 
-    for (int i = 0; i < TINYCLI_MAXARGS; i++) {
-        argsDouble[i] = 0;
-    }
+    tinycli_putsn(t.inputStr, strlen(t.inputStr));
 
-    for (int i = 0; i < TINYCLI_MAXARGS; i++) {
-        argsStr[i][0] = '\0';
-    }
-
-    tinycli_putsn(t.inputStr, strlen(t.inputStr));   // write command string
-   
     assert(tinycli_result == t.expectedResult);
-
-    for (int i = 0; i < TINYCLI_MAXARGS; i++) {
-        assert(argsInt[i] == t.expectedArgsInt[i]);
-    }
-
-    for (int i = 0; i < TINYCLI_MAXARGS; i++) {
-        assert(argsDouble[i] == t.expectedArgsDouble[i]);
-    }
-
-    for (int i = 0; i < TINYCLI_MAXARGS; i++) {
-        assert(0 == strcmp(argsStr[i], t.expectedArgsStr[i]));
-    }
+    assert(0 == memcmp(argsInt, t.expectedArgsInt, TINYCLI_MAXARGS));
+    assert(0 == memcmp(argsDouble, t.expectedArgsDouble, TINYCLI_MAXARGS));
+    assert(0 == memcmp(argsStr, t.expectedArgsStr, TINYCLI_MAXARGS*TINYCLI_MAXBUFFER));
+    assert(0 == strcmp(echoStr, t.expectedEchoStr));
 }
 
 
