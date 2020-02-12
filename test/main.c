@@ -62,18 +62,20 @@ int    echoTop;
 
 /* Stub echo functions that instead of echoing characters to the
  * terminal, save them to an array for comparison to expected values.  */
-void test_echoc(char c) {
+#ifdef TINYCLI_ENABLE_ECHO
+void tinycli_echoc(char c) {
     echoStr[echoTop++] = c;
 }
-void test_echos(char* s) {
+void tinycli_echos(char* s) {
     strcpy(echoStr+echoTop,s);
     echoTop += strlen(s);
 }
-void test_echosn(char* s, int n) {
+void tinycli_echosn(char* s, int n) {
     strncpy(echoStr+echoTop, s, n);
     int len = strlen(s);
     echoTop += (len <= n) ? len : n;
 }
+#endif
 
 
 /* Runs a single test case represented by the struct t. This involves:

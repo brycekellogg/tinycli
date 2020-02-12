@@ -16,19 +16,33 @@ HEADERS = $(ROOT)/tinycli/tinycli.h \
 
 CFLAGS-noecho-noedit=-DTEST_HEADER='"./testcases-noecho-noedit.h"'
 
-
 CFLAGS-echo-noedit=-DTINYCLI_ENABLE_ECHO \
-                   -Dtinycli_echoc=test_echoc \
-				   -Dtinycli_echos=test_echos \
-				   -Dtinycli_echosn=test_echosn \
-				   -DTEST_HEADER='"./testcases-echo-noedit.h"'
+                   -DTEST_HEADER='"./testcases-echo-noedit.h"'
+
+CFLAGS-echo-edit=-DTINYCLI_ENABLE_ECHO \
+                 -DTINYCLI_ENABLE_EDITING \
+                 -DTEST_HEADER='"./testcases-echo-edit.h"'
+
+CFLAGS-noecho-edit=-DTINYCLI_ENABLE_EDITING \
+                   -DTINYCLI_BACKSPACE="'\b'" \
+                   -DTEST_HEADER='"./testcases-noecho-edit.h"'
+
+all: test-noecho-noedit test-echo-noedit test-echo-edit test-noecho-edit
 
 test-noecho-noedit: $(SOURCES) $(HEADERS)
 	@$(CC) $(CFLAGS) $(CFLAGS-noecho-noedit) $(INCDIRS) $(SOURCES) -o test
 	@./test
 
 test-echo-noedit: $(SOURCES) $(HEADERS)
-	$(CC) $(CFLAGS) $(CFLAGS-echo-noedit) $(INCDIRS) $(SOURCES) -o test
+	@$(CC) $(CFLAGS) $(CFLAGS-echo-noedit) $(INCDIRS) $(SOURCES) -o test
+	@./test
+
+test-echo-edit: $(SOURCES) $(HEADERS)
+	@$(CC) $(CFLAGS) $(CFLAGS-echo-edit) $(INCDIRS) $(SOURCES) -o test
+	@./test
+
+test-noecho-edit: $(SOURCES) $(HEADERS)
+	@$(CC) $(CFLAGS) $(CFLAGS-noecho-edit) $(INCDIRS) $(SOURCES) -o test
 	@./test
 
 clean:

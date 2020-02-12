@@ -75,27 +75,19 @@
 
 
 /* Functions used by tinycli to echo characters back to the
- * terminal. By default these use the standard c io functions,
- * but can be overridden to use custom functions.
+ * terminal. If echoing is enabled, these functions need to
+ * be implemented.
  *
  * tinycli_echoc(c) takes a single char
  * tinycli_echos(s) takes a null terminated string
  * tinycli_schos(s,n) takes a string and the number of chars to echo  */
-#if defined(TINYCLI_ENABLE_ECHO) && !defined(tinycli_echoc)
-#define tinycli_echoc(c)  putchar(c)
-#elif !defined(TINYCLI_ENABLE_ECHO)
+#if defined(TINYCLI_ENABLE_ECHO)
+void tinycli_echoc(char c);
+void tinycli_echos(char* s);
+void tinycli_echosn(char* s, int n);
+#else
 #define tinycli_echoc(c)
-#endif
-
-#if defined(TINYCLI_ENABLE_ECHO) && !defined(tinycli_echos)
-#define tinycli_echos(s)  fputs(s, stdout)
-#elif !defined(TINYCLI_ENABLE_ECHO)
 #define tinycli_echos(s)
-#endif
-
-#if defined(TINYCLI_ENABLE_ECHO) && !defined(tinycli_echosn)
-#define tinycli_echosn(s, n)  fwrite(s, 1, n, stdout)
-#elif !defined(TINYCLI_ENABLE_ECHO)
 #define tinycli_echosn(s, n)
 #endif
 
