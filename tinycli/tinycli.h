@@ -11,11 +11,16 @@
  */
 #ifndef _TINYCLI_H_
 #define _TINYCLI_H_
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
+/* Feature enable flags. These defines enable various features such as
+ * echoing and command editing. To enable them, either uncomment the line
+ * corresponding to the desired feature or define the macro via the compler. */
 //#define TINYCLI_ENABLE_ECHO
 //#define TINYCLI_ENABLE_EDITING
-//#define TINYCLI_ENABLE_HISTORY
 
 
 /* Configure the maximum number of arguments supported. This controls
@@ -76,7 +81,8 @@
 
 /* Functions used by tinycli to echo characters back to the
  * terminal. If echoing is enabled, these functions need to
- * be implemented.
+ * be implemented for your specific platform. Often they can
+ * be written as wrappers around putchar, puts, and fwrite.
  *
  * tinycli_echoc(c) takes a single char
  * tinycli_echos(s) takes a null terminated string
@@ -142,24 +148,43 @@ void tinycli_echosn(char* s, int n);
 #endif
 
 
-/***************
- * Error Codes *
+/* Error codes set by Tinycli. In the event of an error, the
+ * global variable tinycli_result will be set with a negative
+ * error code. Currently supported error codes are:
+ *
+ * TINYCLI_ERROR_NOCMD   = the command string did not match a
+ *                         registered command.
+ *
+ * TINYCLI_ERROR_NUMARGS = the number of arguments passed in
+ *                         do not match the number of parameters
+ *                         required by the registered command.
+ *
+ * TINYCLI_ERROR_NOCALL  = no command string was passed to tinycli
  ***************/
 #define TINYCLI_ERROR_NOCMD     -1
 #define TINYCLI_ERROR_NUMARGS   -2
 #define TINYCLI_ERROR_NOCALL    -3
 
+/* Stores the result of a registered function when a command is
+ * called or a negative error code as described above. Because
+ * Tinycli will only generate negative error codes, positive
+ * error codes are recommended for registered user functions.  */
 extern int tinycli_result;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
+/* Functions for passing text to Tinycli. This can be done either
+ * a character at a time as they are received, or as a sequence of
+ * characters if they were buffered. Each of these functions
+ * evaluates the incoming characters, performs echoing or line
+ * editing if enabled, and evaluates the command string if a
+ * TINYCLI_ENTER is encountered. Because these functions evaluate
+ * command strings and may launch a user function, it is not
+ * recommended to call these in interrupt routines if your
+ * registered functions may be long running.  */
 void tinycli_putsn(char* s, int n);
 void tinycli_putc(char c);
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif /* _TINYCLI_H_ */

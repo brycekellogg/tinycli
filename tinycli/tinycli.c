@@ -11,7 +11,6 @@
  */
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 
 #include "tinycli.h"
 
@@ -75,7 +74,7 @@
  * max value in tinycli_nargs should be increased to equal
  * the max. The list of arguments in tinycli_lastarg should
  * be increased to two more than the max and should always
- * return the last argument before the variadic paraameter. 
+ * return the last argument before the variadic paraameter.
  *
  * When adding new types, copy tinycli_nargs_i and change
  * the type 'i' to the chosen data type code of the new
@@ -142,7 +141,7 @@
  * When adding new types, make sure the conversion function is named
  * correctly, such that tinycli_sto* points to the correct
  * conversion function when passed the type code. **/
-#define tinycli_args_0( n,i,t) 
+#define tinycli_args_0( n,i,t)
 #define tinycli_args_1( n,i,t)      CONCAT(tinycli_sto,t)(argv[(n) - ((i)-1)])
 #define tinycli_args_2( n,i,t, ...) CONCAT(tinycli_sto,t)(argv[(n) - ((i)-1)]), tinycli_args_1(n, i-1,__VA_ARGS__)
 #define tinycli_args_3( n,i,t, ...) CONCAT(tinycli_sto,t)(argv[(n) - ((i)-1)]), tinycli_args_2(n, i-1,__VA_ARGS__)
@@ -156,16 +155,17 @@
 #define tinycli_args(...) CONCAT(tinycli_args_,tinycli_nargs(__VA_ARGS__))(tinycli_nargs(__VA_ARGS__),tinycli_nargs(__VA_ARGS__),__VA_ARGS__)
 
 
-/* Return value
- */
+/* Stores the result of a registered function when a command is
+ * called or a negative error code as described above. Because
+ * Tinycli will only generate negative error codes, positive
+ * error codes are recommended for registered user functions.  */
 int tinycli_result;
 
 
 /* Declare functions
  *
  * This is here because we actually call the registered functions
- * from this file. Thus we need them declared here.
- */
+ * from this file. Thus we need them declared in this file.  */
 #define tinycli_register(txt, fun, ...) int fun(tinycli_params(__VA_ARGS__));
 #include "tinycli-funs.h"
 #undef tinycli_register
@@ -197,27 +197,68 @@ int tinycli_tokenize(char* str, char* argv[]) {
 }
 
 
-/*
+/* Conversion function for integer type arguments.
  *
+ * Params:
+ *    s = the string to convert to an integer
+ *
+ * Returns: the result of conversion to an integer. Currently
+ *          uses strtol() from the cstdlib. As a result, errno
+ *          is set in the case of a conversion error. In the
+ *          future, tinycli_result will be set in the case
+ *          of an error.
  */
-int tinycli_stoi(const char* c) {
-    return strtol(c, NULL, 0);
+int tinycli_stoi(const char* s) {
+    return strtol(s, NULL, 0);
 }
 
-/*
+
+/* Conversion function for long long type arguments.
  *
+ * Params:
+ *    s = the string to convert to a long long
+ *
+ * Returns: the result of conversion to a long long. Currently
+ *          uses strtoll() from the cstdlib. As a result, errno
+ *          is set in the case of a conversion error. In the
+ *          future, tinycli_result will be set in the case
+ *          of an error.
  */
 long long tinycli_stoll(const char* c) {
     return strtoll(c, NULL, 0);
 }
 
-/*
+
+/* Conversion function for double type arguments.
  *
+ * Params:
+ *    s = the string to convert to a double
+ *
+ * Returns: the result of conversion to a double. Currently
+ *          uses strtod() from the cstdlib. As a result, errno
+ *          is set in the case of a conversion error. In the
+ *          future, tinycli_result will be set in the case
+ *          of an error.
  */
 double tinycli_stod(const char* c) {
     return strtod(c, NULL);
 }
 
+
+/* Conversion function for string type arguments.
+ *
+ * Note that this just passes the string through unmodified.
+ * This means that the return value points to memory in the
+ * tinycli internal argv buffer. This could lead to problems
+ * if the string is needed after the completion of this command.
+ * In this case, the string should be copied to another location
+ * by the registered command function to which this is an argument.
+ *
+ * Params:
+ *    s = the string to "convert" to a string
+ *
+ * Returns: a pointer to the string passed in
+ */
 const char* tinycli_stos(const char* c) {
     return c;
 }
@@ -231,7 +272,7 @@ const char* tinycli_stos(const char* c) {
  *           and the arguments. The command is at index 0
  *           with arguments following.
  *
- * Returns: the result of callback function of a negative
+ * Returns: the result of callback function or a negative
  *          error code if the given command is not found
  *          or if the arguments converted incorrectedly.
  */
@@ -244,7 +285,7 @@ int tinycli_call(int argc, char* argv[]) {
     #define tinycli_register(txt, fun, ...) \
     if (!strcmp(argv[0], txt)) {            \
         return (argc == 1+tinycli_nargs(__VA_ARGS__)) ? fun(tinycli_args(__VA_ARGS__)) : TINYCLI_ERROR_NUMARGS; \
-    } 
+    }
     #include "tinycli-funs.h"
     #undef tinycli_register
 
@@ -259,14 +300,23 @@ int tinycli_call(int argc, char* argv[]) {
  * below, it is appended to a command buffer. This command buffer is then
  * compared against the command string specified in `tinycli_register()`
  *
- * `TINYCLI_ENTER`: indicates that an enter or return code has been sent and
- *                  that this is the end of a command string. Tinycli will
- *                  attempt tokenization and calling a command.
+ * TINYCLI_ENTER: indicates that an enter or return code has been sent and
+ *                that this is the end of a command string. Tinycli will
+ *                attempt tokenization and calling a command.
  *
- * `TINYCLI_BACKSPACE`:
- * `TINYCLI_SKIPCHARS`:
- * `TINYCLI_ESCAPECHARS`:
- * `TiNYCLI_*ARROW`:
+ * TINYCLI_SKIPCHARS: any character in the TINYCLI_SKIPCHARS string is
+ *                    immediately discarded, and no further action taken.
+ *
+ * TINYCLI_BACKSPACE: indicates that a backspace character has been sent.
+ *                    Tinycli will remove the character before the cursor
+ *                    from the command string buffer. Only used if
+ *                    editing is enabled via TINYCLI_ENABLE_EDITING
+ *
+ * TiNYCLI_LEFTARROW
+ * TINYCLI_RIGHTARROW: indicates that the cursor should be moved to the
+ *                     left or right and that the current position in the
+ *                     command string buffer is updated accordingly. This is
+ *                     only used if TINYCLI_ENABLE_EDITING is enabled.
  *
  * Params:
  *     c = the character to append
