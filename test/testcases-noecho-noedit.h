@@ -18,6 +18,14 @@ testcase tests[] = {
         .expectedArgsDouble = {0},
         .expectedResult = 1, },
 
+    {   .testname = "Void Function (Bad Arg)",
+        .inputStr = "v 12\r",
+        .expectedEchoStr = "",
+        .expectedArgsInt = {0},
+        .expectedArgsStr = {""},
+        .expectedArgsDouble = {0},
+        .expectedResult = TINYCLI_ERROR_NUMARGS, },
+
     {   .testname = "Int Function",
         .inputStr = "i 13\r",
         .expectedEchoStr = "",
@@ -30,6 +38,46 @@ testcase tests[] = {
         .inputStr = "i 0x13\r",
         .expectedEchoStr = "",
         .expectedArgsInt = {0x13},
+        .expectedArgsStr = {""},
+        .expectedArgsDouble = {0},
+        .expectedResult = 2,  },
+
+    {   .testname = "Int Function (Negative)",
+        .inputStr = "i -13\r",
+        .expectedEchoStr = "",
+        .expectedArgsInt = {-13},
+        .expectedArgsStr = {""},
+        .expectedArgsDouble = {0},
+        .expectedResult = 2,  },
+
+    {   .testname = "Int Function (Positive)",
+        .inputStr = "i +13\r",
+        .expectedEchoStr = "",
+        .expectedArgsInt = {13},
+        .expectedArgsStr = {""},
+        .expectedArgsDouble = {0},
+        .expectedResult = 2,  },
+
+    {   .testname = "Int Function (Bad Arg Double)",
+        .inputStr = "i 1.5\r",
+        .expectedEchoStr = "",
+        .expectedArgsInt = {1}, // TODO: throw error on bad conversion
+        .expectedArgsStr = {""},
+        .expectedArgsDouble = {0},
+        .expectedResult = 2,  },
+
+    {   .testname = "Int Function (Bad Arg String)",
+        .inputStr = "i jim\r",
+        .expectedEchoStr = "",
+        .expectedArgsInt = {0}, // TODO: throw error on bad conversion
+        .expectedArgsStr = {""},
+        .expectedArgsDouble = {0},
+        .expectedResult = 2,  },
+
+    {   .testname = "Int Function (Bad Arg Long)",
+        .inputStr = "i 4294967298\r",
+        .expectedEchoStr = "",
+        .expectedArgsInt = {2}, // TODO: throw error on bad conversion
         .expectedArgsStr = {""},
         .expectedArgsDouble = {0},
         .expectedResult = 2,  },
