@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "munit.h"
 #include "tinycli.h"
 #include "testfunctions.h"
 
@@ -92,11 +93,11 @@ void runTest(testcase t) {
 
     tinycli_putsn(t.inputStr, strlen(t.inputStr));
 
-    assert(tinycli_result == t.expectedResult);
-    assert(0 == memcmp(argsInt, t.expectedArgsInt, TINYCLI_MAXARGS));
-    assert(0 == memcmp(argsDouble, t.expectedArgsDouble, TINYCLI_MAXARGS));
-    assert(0 == memcmp(argsStr, t.expectedArgsStr, TINYCLI_MAXARGS*TINYCLI_MAXBUFFER));
-    assert(0 == strcmp(echoStr, t.expectedEchoStr));
+    munit_assert_int(tinycli_result, ==, t.expectedResult);
+    munit_assert_memory_equal(TINYCLI_MAXARGS, argsInt, t.expectedArgsInt);
+    munit_assert_memory_equal(TINYCLI_MAXARGS, argsDouble, t.expectedArgsDouble);
+    munit_assert_memory_equal(TINYCLI_MAXARGS*TINYCLI_MAXBUFFER, argsStr, t.expectedArgsStr);
+    munit_assert_string_equal(echoStr, t.expectedEchoStr);
 }
 
 

@@ -8,7 +8,8 @@ CFLAGS = --std=c99 \
 INCDIRS = -I$(ROOT)/tinycli/ -I./ -I../
 
 SOURCES = $(ROOT)/tinycli/tinycli.c \
-		  $(ROOT)/test/main.c
+		  $(ROOT)/test/main.c \
+		  $(ROOT)/test/munit.c
 
 HEADERS = $(ROOT)/tinycli/tinycli.h \
 		  $(ROOT)/test/tinycli-funs.h \
