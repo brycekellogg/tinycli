@@ -376,8 +376,8 @@ void tinycli_putc(char c) {
         for (int i = cur-1; i < top-1; i++) {
             buffer[i] = buffer[i+1];
         }
-        cur--;
-        top--;
+        cur = (cur == 0) ? cur : cur-1;
+        top = (top == 0) ? top : top-1;
 
         // Move cursor back one, print remaining buffer, erase
         // last character, and reset cursor to correct position.
