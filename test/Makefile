@@ -31,8 +31,8 @@ CFLAGS-echo-edit=-DTINYCLI_ENABLE_ECHO \
 
 CFLAGS-noecho-edit=-DTINYCLI_ENABLE_EDITING \
                    -DTINYCLI_BACKSPACE="'\b'" \
-                   -DTINYCLI_LEFTARROW="\"\x1BL\"" \
-                   -DTINYCLI_RIGHTARROW="\"\x1BR\"" \
+                   -DTINYCLI_LEFTARROW="\"<\"" \
+                   -DTINYCLI_RIGHTARROW="\">\"" \
                    -DTEST_HEADER='"./testcases-noecho-edit.h"'
 
 all: test-noecho-noedit test-echo-noedit test-echo-edit test-noecho-edit

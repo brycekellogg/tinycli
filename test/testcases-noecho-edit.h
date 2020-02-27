@@ -35,7 +35,7 @@ testcase tests[] = {
         .expectedResult = 4, },
 
     {   .testname = "Left Arrow & Backspace",
-        .inputStr = "longfunction00me\x1BL\x1BL\b\bna\r",
+        .inputStr = "longfunction00me<<\b\bna\r",
         .expectedEchoStr = "",
         .expectedArgsInt = {0},
         .expectedArgsStr = {""},
@@ -43,7 +43,7 @@ testcase tests[] = {
         .expectedResult = 1,  },
 
     {   .testname = "Arrows & Insert",
-        .inputStr = "longfunctonnme\x1BL\x1BL\x1BL\x1BL\x1BLi\x1BR\x1BR\x1BRa\r",
+        .inputStr = "longfunctonnme<<<<<i>>>a\r",
         .expectedEchoStr = "",
         .expectedArgsInt = {0},
         .expectedArgsStr = {""},
@@ -51,7 +51,7 @@ testcase tests[] = {
         .expectedResult = 1,  },
 
     {   .testname = "Too Many Left Arrow",
-        .inputStr = "un\x1BL\x1BL\x1BL\x1BLf\r",
+        .inputStr = "un<<<<f\r",
         .expectedEchoStr = "",
         .expectedArgsInt = {0},
         .expectedArgsStr = {""},
@@ -59,7 +59,7 @@ testcase tests[] = {
         .expectedResult = 1,  },
 
     {   .testname = "Too Many Right Arrow",
-        .inputStr = "fu\x1BR\x1BRn\r",
+        .inputStr = "fu>>n\r",
         .expectedEchoStr = "",
         .expectedArgsInt = {0},
         .expectedArgsStr = {""},
