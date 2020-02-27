@@ -22,6 +22,11 @@ CFLAGS-echo-noedit=-DTINYCLI_ENABLE_ECHO \
 
 CFLAGS-echo-edit=-DTINYCLI_ENABLE_ECHO \
                  -DTINYCLI_ENABLE_EDITING \
+                 -DTINYCLI_BACKSPACE="'\b'" \
+                 -DTINYCLI_LEFTARROW="\"<\"" \
+                 -DTINYCLI_RIGHTARROW="\">\"" \
+                 -DTINYCLI_CURSORFORWARD="\">\"" \
+                 -DTINYCLI_CURSORBACKWARD="\"<\"" \
                  -DTEST_HEADER='"./testcases-echo-edit.h"'
 
 CFLAGS-noecho-edit=-DTINYCLI_ENABLE_EDITING \
