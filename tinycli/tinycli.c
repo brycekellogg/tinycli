@@ -379,6 +379,7 @@ void tinycli_putc(char c) {
             buffer[i] = buffer[i+1];
         }
         top = (top == 0) ? top : top-1;
+        cur = (cur > top) ? top : cur;
 
         // Print buffer until end, erase last character,
         // and reset cursor to correct position.

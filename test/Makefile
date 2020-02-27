@@ -23,6 +23,7 @@ CFLAGS-echo-noedit=-DTINYCLI_ENABLE_ECHO \
 CFLAGS-echo-edit=-DTINYCLI_ENABLE_ECHO \
                  -DTINYCLI_ENABLE_EDITING \
                  -DTINYCLI_BACKSPACE="'\b'" \
+                 -DTINYCLI_DEL="\"~\"" \
                  -DTINYCLI_LEFTARROW="\"<\"" \
                  -DTINYCLI_RIGHTARROW="\">\"" \
                  -DTINYCLI_CURSORFORWARD="\">\"" \
@@ -31,6 +32,7 @@ CFLAGS-echo-edit=-DTINYCLI_ENABLE_ECHO \
 
 CFLAGS-noecho-edit=-DTINYCLI_ENABLE_EDITING \
                    -DTINYCLI_BACKSPACE="'\b'" \
+                   -DTINYCLI_DEL="\"~\"" \
                    -DTINYCLI_LEFTARROW="\"<\"" \
                    -DTINYCLI_RIGHTARROW="\">\"" \
                    -DTEST_HEADER='"./testcases-noecho-edit.h"'
