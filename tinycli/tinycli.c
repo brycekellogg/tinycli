@@ -346,8 +346,8 @@ void tinycli_putc(char c) {
     if (escCntLeft < sizeof(TINYCLI_LEFTARROW) && c == TINYCLI_LEFTARROW[escCntLeft]) escCntLeft++;
     if (escCntLeft == sizeof(TINYCLI_LEFTARROW)-1) {
         escCntLeft = 0;
+        if (cur > 0) tinycli_echos(TINYCLI_CURSORBACKWARD);
         cur = (cur > 0) ? cur-1 : 0;
-        tinycli_echos(TINYCLI_CURSORBACKWARD);
         return;
     }
 
@@ -359,8 +359,8 @@ void tinycli_putc(char c) {
     if (escCntRight < sizeof(TINYCLI_RIGHTARROW) && c == TINYCLI_RIGHTARROW[escCntRight]) escCntRight++;
     if (escCntRight == sizeof(TINYCLI_RIGHTARROW)-1) {
         escCntRight = 0;
+        if (cur < top) tinycli_echos(TINYCLI_CURSORFORWARD);
         cur = (cur < top) ? cur+1 : top;
-        tinycli_echos(TINYCLI_CURSORFORWARD);
         return;
     }
 

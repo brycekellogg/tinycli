@@ -52,7 +52,7 @@ testcase tests[] = {
 
     {   .testname = "Too Many Left Arrow",
         .inputStr = "un<<<<f\r",
-        .expectedEchoStr = "un<<<<fun<<\r\n",
+        .expectedEchoStr = "un<<fun<<\r\n",
         .expectedArgsInt = {0},
         .expectedArgsStr = {""},
         .expectedArgsDouble = {0},
@@ -60,7 +60,23 @@ testcase tests[] = {
 
     {   .testname = "Too Many Right Arrow",
         .inputStr = "fu>>n\r",
-        .expectedEchoStr = "fu>>n\r\n",
+        .expectedEchoStr = "fun\r\n",
+        .expectedArgsInt = {0},
+        .expectedArgsStr = {""},
+        .expectedArgsDouble = {0},
+        .expectedResult = 1,  },
+
+    {   .testname = "Too Many Right Arrow w/ Backspace",
+        .inputStr = "f?>>\bun\r",
+        .expectedEchoStr = "f?< <un\r\n",
+        .expectedArgsInt = {0},
+        .expectedArgsStr = {""},
+        .expectedArgsDouble = {0},
+        .expectedResult = 1,  },
+
+    {   .testname = "Too Many Right Arrow w/ Left Arrow",
+        .inputStr = "fn>><u\r",
+        .expectedEchoStr = "fn<un<\r\n",
         .expectedArgsInt = {0},
         .expectedArgsStr = {""},
         .expectedArgsDouble = {0},

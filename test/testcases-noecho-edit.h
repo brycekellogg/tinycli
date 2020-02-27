@@ -65,5 +65,21 @@ testcase tests[] = {
         .expectedArgsStr = {""},
         .expectedArgsDouble = {0},
         .expectedResult = 1,  },
+
+    {   .testname = "Right Arrow at End of Line",
+        .inputStr = "fun>>>>\r",
+        .expectedEchoStr = "",
+        .expectedArgsInt = {0},
+        .expectedArgsStr = {""},
+        .expectedArgsDouble = {0},
+        .expectedResult = 1,  },
+
+    {   .testname = "Right Arrow at End of Line w/ Backspace",
+        .inputStr = "fun>>>>\bn\r",
+        .expectedEchoStr = "",
+        .expectedArgsInt = {0},
+        .expectedArgsStr = {""},
+        .expectedArgsDouble = {0},
+        .expectedResult = 1,  },
 };
 
