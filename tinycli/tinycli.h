@@ -78,6 +78,14 @@ extern "C" {
 #define TINYCLI_BACKSPACE '\x7f'
 #endif
 
+/* Configure the character that signifies a delete.
+ * Specifically, receiving this character will delete
+ * the entry in the buffer at the index of the current
+ * cursor. This mapping depends on the terminal and can
+ * be reconfigured as needed.  */
+#ifndef TINYCLI_DEL
+#define TINYCLI_DEL "\x1B[3~"
+#endif
 
 /* Functions used by tinycli to echo characters back to the
  * terminal. If echoing is enabled, these functions need to

@@ -364,8 +364,34 @@ void tinycli_putc(char c) {
         return;
     }
 
+    // Test if we have matched the escape sequence for a delete key code.
+    // If so, we reset the escape sequence counter, shift the buffer left one,
+    // and echo the remaining shifted buffer.
+    static int escCntDel = 0;
+    if (escCntDel < sizeof(TINYCLI_DEL) && c != TINYCLI_DEL[escCntDel]) escCntDel = 0;
+    if (escCntDel < sizeof(TINYCLI_DEL) && c == TINYCLI_DEL[escCntDel]) escCntDel++;
+    if (escCntDel == sizeof(TINYCLI_DEL)-1) {
+        escCntDel = 0;
+
+        // Delete character by shifting buffer left one.
+        // Update top given deleted character.
+        for (int i = cur; i < top-1; i++) {
+            buffer[i] = buffer[i+1];
+        }
+        top = (top == 0) ? top : top-1;
+
+        // Print buffer until end, erase last character,
+        // and reset cursor to correct position.
+        tinycli_echosn(buffer+cur, top-cur);
+        tinycli_echoc(' ');
+        for (int i = top; i >= cur; i--) tinycli_echos(TINYCLI_CURSORBACKWARD);
+
+        // Nothing to save to the buffer
+        return;
+    }
+
     // Don't add escape sequences to the buffer
-    if (escCntLeft != 0 || escCntRight != 0) return;
+    if (escCntLeft != 0 || escCntRight != 0 || escCntDel != 0) return;
 
 
     // Handle backspace
