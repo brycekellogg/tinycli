@@ -312,6 +312,11 @@ int tinycli_call(int argc, char* argv[]) {
  *                    from the command string buffer. Only used if
  *                    editing is enabled via TINYCLI_ENABLE_EDITING
  *
+ * TINYCLI_DEL: indicates that a delete character has been sent.
+ *              Tinycli will remove the character under the cursor
+ *              from the command string buffer. Only used if
+ *              editing is enabled via TINYCLI_ENABLE_EDITING
+ *
  * TiNYCLI_LEFTARROW
  * TINYCLI_RIGHTARROW: indicates that the cursor should be moved to the
  *                     left or right and that the current position in the
@@ -391,8 +396,6 @@ void tinycli_putc(char c) {
         // Nothing to save to the buffer
         return;
     }
-
-
 
     // Test if we have matched the escape sequence for a backspace key code.
     // If so, we reset the escape sequence counter, shift the buffer left one,
