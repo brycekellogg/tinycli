@@ -391,12 +391,16 @@ void tinycli_putc(char c) {
         return;
     }
 
-    // Don't add escape sequences to the buffer
-    if (escCntLeft != 0 || escCntRight != 0 || escCntDel != 0) return;
 
 
-    // Handle backspace
-    if (c == TINYCLI_BACKSPACE) {
+    // Test if we have matched the escape sequence for a backspace key code.
+    // If so, we reset the escape sequence counter, shift the buffer left one,
+    // decrement the top and current, and echo the remaining shifted buffer.
+    static int escCntBack = 0;
+    if (escCntBack < sizeof(TINYCLI_BACKSPACE) && c != TINYCLI_BACKSPACE[escCntBack]) escCntBack = 0;
+    if (escCntBack < sizeof(TINYCLI_BACKSPACE) && c == TINYCLI_BACKSPACE[escCntBack]) escCntBack++;
+    if (escCntBack == sizeof(TINYCLI_BACKSPACE)-1) {
+        escCntBack = 0;
 
         // Delete character by shifting buffer left one.
         // Update cur and top given deleted character.
@@ -416,6 +420,10 @@ void tinycli_putc(char c) {
         // Nothing to save to the buffer
         return;
     }
+
+    // Don't add escape sequences to the buffer
+    if (escCntLeft != 0 || escCntRight != 0 || escCntDel != 0 || escCntBack != 0) return;
+
 #endif  // TINYCLI_ENABLE_EDITING
 
 

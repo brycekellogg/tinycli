@@ -75,7 +75,7 @@ extern "C" {
  * the cursor. This is generally mapped to DEL, but can
  * be reconfigured as needed for different terminals.  */
 #ifndef TINYCLI_BACKSPACE
-#define TINYCLI_BACKSPACE '\x7f'
+#define TINYCLI_BACKSPACE "\x7f"
 #endif
 
 /* Configure the character that signifies a delete.
