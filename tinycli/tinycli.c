@@ -380,10 +380,11 @@ void tinycli_putc(char c) {
         }
         top = (top == 0) ? top : top-1;
         cur = (cur > top) ? top : cur;
+        buffer[top] = '\0';     // Set null character at end of str
 
         // Print buffer until end, erase last character,
         // and reset cursor to correct position.
-        tinycli_echosn(buffer+cur, top-cur);
+        tinycli_echos(buffer+cur);
         tinycli_echoc(' ');
         for (int i = top; i >= cur; i--) tinycli_echos(TINYCLI_CURSORBACKWARD);
 
@@ -409,11 +410,12 @@ void tinycli_putc(char c) {
         }
         cur = (cur == 0) ? cur : cur-1;
         top = (top == 0) ? top : top-1;
+        buffer[top] = '\0';     // Set null character at end of str
 
         // Move cursor back one, print remaining buffer, erase
         // last character, and reset cursor to correct position.
         tinycli_echos(TINYCLI_CURSORBACKWARD);
-        tinycli_echosn(buffer+cur, top-cur);
+        tinycli_echos(buffer+cur);
         tinycli_echoc(' ');
         for (int i = top; i >= cur; i--) tinycli_echos(TINYCLI_CURSORBACKWARD);
 
@@ -443,12 +445,12 @@ void tinycli_putc(char c) {
             buffer[i] = buffer[i-1];
         }
         buffer[cur++] = c;
-        top++;
+        buffer[++top] = '\0';
 
         // Echo character, print remaining buffer,
         // and reset cursor to correct position.
         tinycli_echoc(c);
-        tinycli_echosn(buffer+cur, top-cur);
+        tinycli_echos(buffer+cur);
         for (int i = top; i > cur; i--) tinycli_echos(TINYCLI_CURSORBACKWARD);
     }
 }

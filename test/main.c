@@ -71,11 +71,6 @@ void tinycli_echos(char* s) {
     strcpy(echoStr+echoTop,s);
     echoTop += strlen(s);
 }
-void tinycli_echosn(char* s, int n) {
-    strncpy(echoStr+echoTop, s, n);
-    int len = strlen(s);
-    echoTop += (len <= n) ? len : n;
-}
 #endif
 
 

@@ -90,19 +90,16 @@ extern "C" {
 /* Functions used by tinycli to echo characters back to the
  * terminal. If echoing is enabled, these functions need to
  * be implemented for your specific platform. Often they can
- * be written as wrappers around putchar, puts, and fwrite.
+ * be written as wrappers around putchar and puts.
  *
  * tinycli_echoc(c) takes a single char
- * tinycli_echos(s) takes a null terminated string
- * tinycli_schos(s,n) takes a string and the number of chars to echo  */
+ * tinycli_echos(s) takes a null terminated string */
 #if defined(TINYCLI_ENABLE_ECHO)
 void tinycli_echoc(char c);
 void tinycli_echos(char* s);
-void tinycli_echosn(char* s, int n);
 #else
 #define tinycli_echoc(c)
 #define tinycli_echos(s)
-#define tinycli_echosn(s, n)
 #endif
 
 
