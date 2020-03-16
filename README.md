@@ -1,41 +1,35 @@
-# tinycli
+# Tinycli
 
 Tinycli is a small C library for providing a simple command line interface
 to resource constrained embedded systems. The library is designed to be small,
 lightweight, and extremely portable while still containing a useful feature
 set for interacting with microcontrollers via a terminal interface.
 
-Tinycli works by directly mapping a text command to a C function.
-
-
-## Quickstart
-
-
-```C
-void doSomething(int a, double b, int c) {
-    printf("I'm a function!! %d %f %d\n", a, b, c);
-}
-```
-
-```C
-tinycli_register("doit", doSomething, idi)
-```
-
 ## Usage
 
 Commands in Tinycli are statically declared at compile time via the tinycli-funs.h
-header file.
+header file. Each command consists of a command string, a function name,
+and a list of function parameter types. After commands are declared at compile
+time, text can be passed to the tinycli library to be compared against the
+registered command strings. In the case of a match, string arguments will
+be converted to the appropriate types and the registered function will be
+called.
 
 
 ### Registering a command
-
+Commands are registered in a header file called `tinycli-funs.h`, which is then
+used by `tinycli.c` when comparing input strings and converting parameter
+types. Each line in `tinycli-funs.h` consists of a registration call of the
+form:
 ```C
-tinycli_register("command string", function_name, parameter_types)
+tinycli_register("CommandString", function_ptr, type0, [type1], [type2], ...)
 ```
-
-where the `parameter_type` is a descriptor of the types of arguments the
-function is expecting. This is used to automatically convert the string inputs
-to the correct type for passing into the function.
+where `"CommandString"` is the string that is typed at the prompt for
+triggering a function, `function_ptr` is a pointer to the function to call
+when the correct string is entered, and `type0`, `type1`, etc are
+descriptors of the parameter types of the `function_ptr`. Each function must
+declare at least 1 parameter type. The table below shows the currently
+supported parameter types.
 
 | Type        | Code | Example |
 |-------------|------|---------|
@@ -46,29 +40,42 @@ to the correct type for passing into the function.
 | `long long` | `ll` | 9999999 |
 
 ### Passing text
+In order for Tinycli to process input text, evaulate potential matches, and
+call registered functions, text musted be passed to the library using one of
+the following functions:
+
 ```C
 void tinycli_putsn(char* s, int n);
 void tinycli_putc(char c);
 ```
+
+These functions allow you to pass text to Tinycli either a character at a time
+or via entire strings. When the input buffer matches a registered command,
+the corresponding function will be called. Placing calls to these functions in
+interrupts is currently discouraged because they may launch long running
+functions (depending on the functions registered).
+
 ### Checking Results
-```C
-assert(tinycli_result == 1);
-```
+Tinycli stores the result of operations and user functions in the variable
+`tinycli_result`. The library itself will only ever return negative error
+codes, so positive return codes can be reserved for user functions. Note that
+all user functions must have return type `int` and therefore return some
+sort of status code.
 
-## Configuring TinyCli ##
+## Configuring TinyCli
 
 
 
 
 
-## Extending TinyCli ##
+## Extending TinyCli
 TinyCli has beed designed to support a limited set of input data types and
 a limited number of command arguments. In the event that additional data types
 or additional command arguments are needed, TinyCli can easily be extended
 to support any needed types or number of arguments.
 
 
-#### New Data Types ####
+#### New Data Types
 Currently supported data types are: `int`, `double`, `long long`, and `char*`.
 To add support for an additional type, write a conversion function from `char*`
 to the new type, and register the new type with the various TinyCli macros.
@@ -79,7 +86,7 @@ data type, a new type code needs to be chosen. Generally, these should be
 related to the C++ name mangling scheme, but any valid C identifier will
 work.
 
-##### Registering Type Code #####
+##### Registering Type Code
 Once a type code has been chosen, it needs to be registered with TinyCli by
 adding it to the `tinycli_types_*` and `tinycli_nargs_*` macros in `tinycli.c`.
 The former tells us the mapping between type code and C type; the latter
@@ -99,7 +106,7 @@ where `<code>` is the chosen type code and `<type>` is the C data type.
 type code.
 
 
-##### Conversion Function #####
+##### Conversion Function
 In order to call a registered function with the correct parameters, TinyCli
 needs a conversion function for each supported type. These conversion
 functions are of the form:
@@ -117,11 +124,11 @@ other `tinycli_sto*` functions. Note that the name of the function is
 important and must match the above scheme exactly.
 
 
-#### Increasing Max Number of Arguments ####
+#### Increasing Max Number of Arguments
 By default, TinyCli supports a limited number of arguments per command. To
 increase this number, we need to edit a few macros in `tinycli.c`.
 
-##### Argument Counting Macros #####
+##### Argument Counting Macros
 The first set of macros to edit are the argument counting macros
 `tinycli_nargs` and `tinycli_lastarg`. These macros use `__VA_ARGS__` to count
 the number of function parameters each registered function expects. To update
@@ -147,7 +154,7 @@ becomes
 ```
 
 
-##### Parameter & Args Conversion Macros #####
+##### Parameter & Args Conversion Macros
 The second set of macros to edit are the params and args conversion macros.
 These sections have a macro defined for each possible number of command
 arguments. When increasing the maximum supported number of arguments, we add
