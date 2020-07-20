@@ -8,128 +8,146 @@
  * Author: Bryce Kellogg (bryce@kellogg.org)
  * Copyright: 2019 Bryce Kellogg
  * License: BSD 3-Clause
+ *
+ * TODO: description
  */
 #include <msp430.h>
+#include <string.h>
+#include <stdbool.h>
 
-#define LED1_PORT 4
-#define LED2_PORT 1
-#define LED1_BIT  6
-#define LED2_BIT  0
+#include <tinycli.h>
 
-#define OUTPUT 0
-#define INPUT 1
-
-#define ERR_BAD_PORT 1
-#define ERR_BAD_DIR  2
-#define ERR_BAD_LED  3
-#define ERR_BAD_VAL  4
+// Ports and pins used to control LEDs
+// These map MSP430 defines to LED numbers
+#define LED1_PORT  P4OUT
+#define LED2_PORT  P1OUT
+#define LED1_BIT   BIT6
+#define LED2_BIT   BIT0
 
 
-// GPIO Commands
-int gpioConfig(int port, int bit, int dir) {
-    volatile char* pdir;
-    bit = BIT0 << bit;
+/**
+ * Set the state of an LED on the dev board.
+ *
+ * Params:
+ *   led     the number (1 or 2) of the LED to set
+ *   state   the state (ON or OFF) to set LED to
+ */
+int setLED(int led, const char* state) {
+    bool on  = !strcmp(state, "ON");
+    bool off = !strcmp(state, "OFF");
 
-    // Get port
-    switch (port) {
-        case 1: pdir = &P1DIR; break;
-        case 2: pdir = &P2DIR; break;
-        case 3: pdir = &P3DIR; break;
-        case 4: pdir = &P4DIR; break;
-        default: return ERR_BAD_PORT;
-    }
+    // Error checking
+    if (led != 1 && led != 2) return 1;
+    if (!on && !off)          return 2;
 
-    // Set direction
-    switch (dir) {
-        case INPUT:  *pdir &= ~bit; break;
-        case OUTPUT: *pdir |= bit;  break;
-        default: return ERR_BAD_DIR;
-    }
+    // Set LED state
+    if (led == 1 && on)  LED1_PORT |=  LED1_BIT;
+    if (led == 1 && off) LED1_PORT &= ~LED1_BIT;
+    if (led == 2 && on)  LED2_PORT |=  LED2_BIT;
+    if (led == 2 && off) LED2_PORT &= ~LED2_BIT;
     return 0;
 }
 
-int gpioRead(int gpio) {
 
-}
+/**
+ * Read the state of a button on the dev
+ * board and print out the result as
+ * either "PRESSED" or "UNPRESSED"
+ *
+ * Params:
+ *    button   the number (1 or 2) of
+ *             the button to query
+ */
+int readButton(int button) {
+    // Error checking
+    if (button != 1 && button != 2) return 1;
 
-int gpioWrite(int port, int bit, int val) {
-    volatile char* pout;
-    bit = BIT0 << bit;
+    // Get button value
+    int val;
+    if (button == 1) val = 1;
+    if (button == 2) val = 0;
 
-    // Get port
-    switch (port) {
-        case 1: pout = &P1OUT; break;
-        case 2: pout = &P2OUT; break;
-        case 3: pout = &P3OUT; break;
-        case 4: pout = &P4OUT; break;
-        default: return ERR_BAD_PORT;
-    }
-
-    // Set value
-    switch (val) {
-        case 0: *pout &= ~bit; break;
-        case 1: *pout |= bit;  break;
-        default: return ERR_BAD_VAL;
-    }
-    return 0;
-
-}
-
-
-// LED Commands
-int setLedState(int led, int val) {
-    switch (led) {
-        case 1: gpioWrite(LED1_PORT, LED1_BIT, val); break;
-        case 2: gpioWrite(LED2_PORT, LED2_BIT, val); break;
-        default: return ERR_BAD_LED;
-    }
+    // Print button state
+    // TODO: print based on val
     return 0;
 }
-int setLed1On  (void) { return setLedState(1, 1); }
-int setLed1Off (void) { return setLedState(1, 0); }
-int setLed2On  (void) { return setLedState(2, 1); }
-int setLed2Off (void) { return setLedState(2, 0); }
 
 
-// SPI commands
-int spiTxRx(int a, int b) {
+/**
+ * Prints a help message detailing what commands
+ * are available and how to call them. */
+int help(void) {
 
+    return 0;
 }
 
-int setSpiRate(double rate) {
-
-}
-
+char bufchar;
 void main() {
     WDTCTL = WDTPW + WDTHOLD;  // Stop watchdog timer
     PM5CTL0 &= ~LOCKLPM5;      // Disable GPIO power-on defaults
 
+    // Configure GOIOs for LEDs
+    P4DIR |= BIT6;  // Set P4.6 (LED1) to output
+    P1DIR |= BIT0;  // Set P1.0 (LED2) to output
 
+    // Configure GPIOs for UART
+    P2SEL1 |= BIT0 | BIT1;                    // USCI_A0 UART operation
+    P2SEL0 &= ~(BIT0 | BIT1);
 
-    gpioConfig(4,6, OUTPUT);
-    gpioConfig(1,0, OUTPUT);
-  
-    //setLed1Off();
-    setLed1On();
-    //setLed2On();
-    setLed2Off();
+    // Startup clock system with max DCO setting ~8MHz
+    CSCTL0_H = CSKEY >> 8;                    // Unlock clock registers
+    CSCTL1 = DCOFSEL_3 | DCORSEL;             // Set DCO to 8MHz
+    CSCTL2 = SELA__VLOCLK | SELS__DCOCLK | SELM__DCOCLK;
+    CSCTL3 = DIVA__1 | DIVS__1 | DIVM__1;     // Set all dividers
+    CSCTL0_H = 0;                             // Lock CS registers
 
+    // Setup UART
+    UCA0CTLW0 = UCSWRST;                      // Put eUSCI in reset
+    UCA0CTLW0 |= UCSSEL__SMCLK;               // CLK = SMCLK
+    UCA0BR0 = 52;                             // 8000000/16/9600
+    UCA0BR1 = 0x00;
+    UCA0MCTLW |= UCOS16 | UCBRF_1;
+    UCA0CTLW0 &= ~UCSWRST;                    // Initialize eUSCI
+    UCA0IE |= UCRXIE;                         // Enable USCI_A0 RX interrupt
+
+    // LEDs initially off
+    setLED(1, "OFF");
+    setLED(2, "OFF");
+
+    tinycli_echos(">>> ");
     for(;;) {
-
+        __bis_SR_register(LPM3_bits | GIE);
+        tinycli_putc(UCA0RXBUF);
+        if (UCA0RXBUF == '\r') {
+            tinycli_echos(">>> ");
+        }
     }
 }
 
 
+void tinycli_echoc(char c) {
+    while(!(UCA0IFG&UCTXIFG));
+    UCA0TXBUF = c;
+}
+
+void tinycli_echos(char* s) {
+    while (*s != '\0') {
+        tinycli_echoc(*s);
+        s++;
+    }
+}
+
+/*
+ *
+ */
 void __attribute__ ((interrupt(USCI_A0_VECTOR))) USCI_A0_ISR (void) {
-  switch(__even_in_range(UCA0IV, USCI_UART_UCTXCPTIFG)) {
-    case USCI_NONE: break;
-    case USCI_UART_UCRXIFG:
-      while(!(UCA0IFG&UCTXIFG));
-      UCA0TXBUF = UCA0RXBUF;
-      __no_operation();
-      break;
-    case USCI_UART_UCTXIFG: break;
-    case USCI_UART_UCSTTIFG: break;
-    case USCI_UART_UCTXCPTIFG: break;
-  }
+    switch(__even_in_range(UCA0IV, USCI_UART_UCTXCPTIFG)) {
+        case USCI_NONE: break;
+        case USCI_UART_UCRXIFG:
+            LPM3_EXIT;
+            break;
+        case USCI_UART_UCTXIFG: break;
+        case USCI_UART_UCSTTIFG: break;
+        case USCI_UART_UCTXCPTIFG: break;
+    }
 }
