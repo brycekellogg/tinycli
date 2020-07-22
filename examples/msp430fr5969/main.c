@@ -88,7 +88,7 @@ int help(void) {
     return 0;
 }
 
-char bufchar;
+
 void main() {
     WDTCTL = WDTPW + WDTHOLD;  // Stop watchdog timer
     PM5CTL0 &= ~LOCKLPM5;      // Disable GPIO power-on defaults
