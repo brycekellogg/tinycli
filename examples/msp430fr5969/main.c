@@ -24,6 +24,14 @@
 #define LED1_BIT   BIT6
 #define LED2_BIT   BIT0
 
+// Ports and pins used to query the
+// values of buttons. They map to
+// the button names on the dev kit
+#define S1_PORT  P4IN
+#define S2_PORT  P1IN
+#define S1_BIT   BIT5
+#define S2_BIT   BIT1
+
 
 /**
  * Set the state of an LED on the dev board.
@@ -62,13 +70,12 @@ int readButton(int button) {
     // Error checking
     if (button != 1 && button != 2) return 1;
 
-    // Get button value
+    // Get button value & print state
     int val;
-    if (button == 1) val = 1;
-    if (button == 2) val = 0;
-
-    // Print button state
-    // TODO: print based on val
+    if (button == 1 && !(S1_PORT & S1_BIT)) tinycli_echos("Button 1 Pressed\r\n");
+    if (button == 1 &&  (S1_PORT & S1_BIT)) tinycli_echos("Button 1 Unpressed\r\n");
+    if (button == 2 && !(S2_PORT & S2_BIT)) tinycli_echos("Button 2 Pressed\r\n");
+    if (button == 2 &&  (S2_PORT & S2_BIT)) tinycli_echos("Button 2 Unpressed\r\n");
     return 0;
 }
 
@@ -89,6 +96,12 @@ void main() {
     // Configure GOIOs for LEDs
     P4DIR |= BIT6;  // Set P4.6 (LED1) to output
     P1DIR |= BIT0;  // Set P1.0 (LED2) to output
+
+    // Configure GPIOs for Buttons
+    P1OUT = BIT1;   // Pull-up resistor on P1.1
+    P1REN = BIT1;   // Select pull-up mode for P1.1
+    P4OUT = BIT5;   // Pull-up resistor on P1.1
+    P4REN = BIT5;   // Select pull-up mode for P1.1
 
     // Configure GPIOs for UART
     P2SEL1 |= BIT0 | BIT1;                    // USCI_A0 UART operation
