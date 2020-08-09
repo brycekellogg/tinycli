@@ -1,2 +1,4 @@
 test/test
 examples/msp430/msp430-gcc*
+*.o
+*.out
