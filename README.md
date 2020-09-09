@@ -1,7 +1,7 @@
 # Tinycli
 
 Tinycli is a small C library for providing a simple command line interface
-to resource constrained embedded systems. The library is designed to be small,
+for resource constrained embedded systems. The library is designed to be small,
 lightweight, and extremely portable while still containing a useful feature
 set for interacting with microcontrollers via a terminal interface.
 
@@ -28,7 +28,8 @@ where `"CommandString"` is the string that is typed at the prompt for
 triggering a function, `function_ptr` is a pointer to the function to call
 when the correct string is entered, and `type0`, `type1`, etc are
 descriptors of the parameter types of the `function_ptr`. Each function must
-declare at least 1 parameter type. The table below shows the currently
+declare at least 1 parameter type; in the case of a function that takes no
+parameters void must be used. The table below shows the currently
 supported parameter types.
 
 | Type        | Code | Example |
@@ -39,9 +40,31 @@ supported parameter types.
 | `char*`     | `s`  | hello   |
 | `long long` | `ll` | 9999999 |
 
+As an example, suppose we want to register the function shown below to be
+called via the command "doSomething". It takes two parameters (an integer and a
+character pointer) which would correspond to the tinycli type descriptors `i`
+and `s`. Note that the return type of all registered functions must be `int` to
+allow passing of error codes from the registered function to the tinycli library.
+It is recommended that the registered function use zero for success and a
+positive return value for failure.
+
+```C
+int some_function(int a, char* str) { ... }
+```
+
+To register the above function, we would add the following line to `tinycli-funs.h`.
+The ordering of registration calls in `tinycli-funs.h` does not matter, but
+commands strings must be unique. Also note the lack of semicolon at the end of
+the register call and the lack of header guards in `tinycli-funs.h`. This is
+intentional and required.
+
+```C
+tinycli_register("doSomething", some_fuinction, i, s)
+```
+
 ### Passing text
 In order for Tinycli to process input text, evaulate potential matches, and
-call registered functions, text musted be passed to the library using one of
+call registered functions, text must be passed to the library using one of
 the following functions:
 
 ```C
@@ -50,17 +73,28 @@ void tinycli_putc(char c);
 ```
 
 These functions allow you to pass text to Tinycli either a character at a time
-or via entire strings. When the input buffer matches a registered command,
-the corresponding function will be called. Placing calls to these functions in
-interrupts is currently discouraged because they may launch long running
-functions (depending on the functions registered).
+or via entire strings. Generally these functions are called after receiving
+UART input via an interrupt routine. If the terminal emulator (picocom, putty,
+etc) is using a local echo feature, it is gnerally recommended that you use the
+`tinycli_putsn` function for passing text. If not using local echo, `tinycli_putc`
+is a better choice as it allows Tinycli to echo characters back as they are typed.
+
+As text input is passed to the Tinycli library, it saves the text in an internal
+text buffer until the library receives a `TINYCLI_ENTER` character. This configurable
+character triggers the library's processing step, where it iterates over the
+registered commands and compares each one with the first word (separated by
+whitespace) of the entered text. If a match is found, the arguments will be
+converted to the correct types, and the corresponding function will be called.
+Placing calls to these functions in interrupts is currently discouraged because
+they may launch long running functions (depending on the functions registered).
 
 ### Checking Results
 Tinycli stores the result of operations and user functions in the variable
 `tinycli_result`. The library itself will only ever return negative error
 codes, so positive return codes can be reserved for user functions. Note that
 all user functions must have return type `int` and therefore return some
-sort of status code.
+sort of status code. The error codes returned by the tinycli library can
+be found in `tinycli.h`.
 
 ## Configuring TinyCli
 
