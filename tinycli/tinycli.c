@@ -441,7 +441,7 @@ void tinycli_putc(char c) {
 
         argc = tinycli_tokenize(buffer, argv);      // Parse command into argv and argc
         tinycli_result = tinycli_call(argc, argv);  // Try to call function
-    } else {
+    } else if(top < TINYCLI_MAXBUFFER - 1){
         // Insert character by shifting buffer right one,
         // and saving char to the newly open index.
         for (int i = top; i > cur; i--) {
