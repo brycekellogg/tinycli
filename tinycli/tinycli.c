@@ -378,6 +378,11 @@ void tinycli_putc(char c) {
     if (escCntDel == sizeof(TINYCLI_DEL)-1) {
         escCntDel = 0;
 
+        // If there is nothing in the buffer,
+        // we don't want to delete anything.
+        // Return immediately, taking no action.
+        if (top == 0) return;
+
         // Delete character by shifting buffer left one.
         // Update top given deleted character.
         for (int i = cur; i < top-1; i++) {
@@ -405,6 +410,11 @@ void tinycli_putc(char c) {
     if (escCntBack < sizeof(TINYCLI_BACKSPACE) && c == TINYCLI_BACKSPACE[escCntBack]) escCntBack++;
     if (escCntBack == sizeof(TINYCLI_BACKSPACE)-1) {
         escCntBack = 0;
+
+        // If there is nothing in the buffer,
+        // we don't want to delete anything.
+        // Return immediately, taking no action.
+        if (top == 0) return;
 
         // Delete character by shifting buffer left one.
         // Update cur and top given deleted character.
