@@ -156,10 +156,17 @@
 
 
 /* Stores the result of a registered function when a command is
- * called or a negative error code as described above. Because
- * Tinycli will only generate negative error codes, positive
- * error codes are recommended for registered user functions.  */
+ * called. Because all commands are required to return int, this
+ * variable is guaranteed to hold the result of a command after it
+ * is called. In the case of a tinycli error (command not found, etc)
+ * this value will not change and will continue to hold the value
+ * from the previous successfully run command.  */
 int tinycli_result;
+
+
+/* Stores error or result codes from the tinycli library itself.
+ * Is used to signal when a command has been completed as well as
+ * if there was an error processing a command.  */
 int tinycli_error;
 
 
@@ -206,7 +213,7 @@ int tinycli_tokenize(char* str, char* argv[]) {
  * Returns: the result of conversion to an integer. Currently
  *          uses strtol() from the cstdlib. As a result, errno
  *          is set in the case of a conversion error. In the
- *          future, tinycli_result will be set in the case
+ *          future, tinycli_error will be set in the case
  *          of an error.
  */
 int tinycli_stoi(const char* s) {
@@ -222,7 +229,7 @@ int tinycli_stoi(const char* s) {
  * Returns: the result of conversion to a long long. Currently
  *          uses strtoll() from the cstdlib. As a result, errno
  *          is set in the case of a conversion error. In the
- *          future, tinycli_result will be set in the case
+ *          future, tinycli_error will be set in the case
  *          of an error.
  */
 long long tinycli_stoll(const char* c) {
@@ -238,7 +245,7 @@ long long tinycli_stoll(const char* c) {
  * Returns: the result of conversion to a double. Currently
  *          uses strtod() from the cstdlib. As a result, errno
  *          is set in the case of a conversion error. In the
- *          future, tinycli_result will be set in the case
+ *          future, tinycli_error will be set in the case
  *          of an error.
  */
 double tinycli_stod(const char* c) {
@@ -277,28 +284,28 @@ const char* tinycli_stos(const char* c) {
  *          error code if the given command is not found
  *          or if the arguments converted incorrectedly.
  */
-int tinycli_call(int argc, char* argv[]) {
-    tinycli_error = TINYCLI_ERROR_SUCCESS;
+void tinycli_call(int argc, char* argv[]) {
+
     /* Skip calls that have no commands */
     if (argc < 1) {
         tinycli_error = TINYCLI_ERROR_NOCALL;
-        return TINYCLI_ERROR_NOCALL;
+        return;
     }
 
-#define tinycli_register(txt, fun, ...)               \
-    if (!strcmp(argv[0], txt)) {                      \
-        if (argc == 1 + tinycli_nargs(__VA_ARGS__)) { \
-            return fun(tinycli_args(__VA_ARGS__));    \
-        } else {                                      \
-            tinycli_error = TINYCLI_ERROR_NUMARGS;    \
-            return TINYCLI_ERROR_NUMARGS;             \
-        }                                             \
+#define tinycli_register(txt, fun, ...)                       \
+    if (!strcmp(argv[0], txt)) {                              \
+        if (argc == 1 + tinycli_nargs(__VA_ARGS__)) {         \
+            tinycli_result = fun(tinycli_args(__VA_ARGS__));  \
+            tinycli_error = TINYCLI_ERROR_SUCCESS;            \
+        } else {                                              \
+            tinycli_error = TINYCLI_ERROR_NUMARGS;            \
+        }                                                     \
+        return;                                               \
     }
     #include "tinycli-funs.h"
     #undef tinycli_register
 
     tinycli_error = TINYCLI_ERROR_NOCMD;
-    return TINYCLI_ERROR_NOCMD;
 }
 
 
@@ -459,7 +466,7 @@ void tinycli_putc(char c) {
         tinycli_echos("\r\n");  // Echo to complete line
 
         argc = tinycli_tokenize(buffer, argv);      // Parse command into argv and argc
-        tinycli_result = tinycli_call(argc, argv);  // Try to call function
+        tinycli_call(argc, argv);  // Try to call function
     } else if(top < TINYCLI_MAXBUFFER - 1){
         // Insert character by shifting buffer right one,
         // and saving char to the newly open index.

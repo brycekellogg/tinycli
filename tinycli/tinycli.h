@@ -154,8 +154,13 @@ void tinycli_echos(char* s);
 
 
 /* Error codes set by Tinycli. In the event of an error, the
- * global variable tinycli_result will be set with a negative
+ * global variable tinycli_error will be set with a negative
  * error code. Currently supported error codes are:
+ *
+ * TINYCLI_ERROR_SUCCESS = indicates that a command was successfully
+ *                         completed (from tinycli point of view). The
+ *                         result of the command can now be checked
+ *                         via the tinycli_result global variable.
  *
  * TINYCLI_ERROR_NOCMD   = the command string did not match a
  *                         registered command.
@@ -166,7 +171,7 @@ void tinycli_echos(char* s);
  *
  * TINYCLI_ERROR_NOCALL  = no command string was passed to tinycli
  ***************/
-#define TINYCLI_ERROR_SUCCESS   0
+#define TINYCLI_ERROR_SUCCESS    0
 #define TINYCLI_ERROR_NOCMD     -1
 #define TINYCLI_ERROR_NUMARGS   -2
 #define TINYCLI_ERROR_NOCALL    -3
