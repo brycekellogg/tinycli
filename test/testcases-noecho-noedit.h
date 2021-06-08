@@ -16,7 +16,9 @@ testcase tests[] = {
         .expectedArgsInt = {0},
         .expectedArgsStr = {""},
         .expectedArgsDouble = {0},
-        .expectedResult = 1, },
+        .expectedResult = 1,
+        .expectedError = TINYCLI_ERROR_SUCCESS,
+    },
 
     {   .testname = "Void Function (Bad Arg)",
         .inputStr = "v 12\r",
@@ -24,7 +26,9 @@ testcase tests[] = {
         .expectedArgsInt = {0},
         .expectedArgsStr = {""},
         .expectedArgsDouble = {0},
-        .expectedResult = TINYCLI_ERROR_NUMARGS, },
+        .expectedResult = 0,
+        .expectedError = TINYCLI_ERROR_NUMARGS,
+    },
 
     {   .testname = "Int Function",
         .inputStr = "i 13\r",
@@ -32,7 +36,9 @@ testcase tests[] = {
         .expectedArgsInt = {13},
         .expectedArgsStr = {""},
         .expectedArgsDouble = {0},
-        .expectedResult = 2, },
+        .expectedResult = 2,
+        .expectedError = TINYCLI_ERROR_SUCCESS,
+    },
 
     {   .testname = "Int Function (Hex)",
         .inputStr = "i 0x13\r",
@@ -40,7 +46,9 @@ testcase tests[] = {
         .expectedArgsInt = {0x13},
         .expectedArgsStr = {""},
         .expectedArgsDouble = {0},
-        .expectedResult = 2,  },
+        .expectedResult = 2,
+        .expectedError = TINYCLI_ERROR_SUCCESS,
+    },
 
     {   .testname = "Int Function (Negative)",
         .inputStr = "i -13\r",
@@ -48,7 +56,9 @@ testcase tests[] = {
         .expectedArgsInt = {-13},
         .expectedArgsStr = {""},
         .expectedArgsDouble = {0},
-        .expectedResult = 2,  },
+        .expectedResult = 2,
+        .expectedError = TINYCLI_ERROR_SUCCESS,
+    },
 
     {   .testname = "Int Function (Positive)",
         .inputStr = "i +13\r",
@@ -56,7 +66,9 @@ testcase tests[] = {
         .expectedArgsInt = {13},
         .expectedArgsStr = {""},
         .expectedArgsDouble = {0},
-        .expectedResult = 2,  },
+        .expectedResult = 2,
+        .expectedError = TINYCLI_ERROR_SUCCESS,
+    },
 
     {   .testname = "Int Function (Bad Arg Double)",
         .inputStr = "i 1.5\r",
@@ -64,7 +76,9 @@ testcase tests[] = {
         .expectedArgsInt = {1}, // TODO: throw error on bad conversion
         .expectedArgsStr = {""},
         .expectedArgsDouble = {0},
-        .expectedResult = 2,  },
+        .expectedResult = 2,
+        .expectedError = TINYCLI_ERROR_SUCCESS,
+    },
 
     {   .testname = "Int Function (Bad Arg String)",
         .inputStr = "i jim\r",
@@ -72,7 +86,9 @@ testcase tests[] = {
         .expectedArgsInt = {0}, // TODO: throw error on bad conversion
         .expectedArgsStr = {""},
         .expectedArgsDouble = {0},
-        .expectedResult = 2,  },
+        .expectedResult = 2,
+        .expectedError = TINYCLI_ERROR_SUCCESS,
+    },
 
     {   .testname = "Int Function (Bad Arg Long)",
         .inputStr = "i 4294967298\r",
@@ -80,7 +96,9 @@ testcase tests[] = {
         .expectedArgsInt = {2}, // TODO: throw error on bad conversion
         .expectedArgsStr = {""},
         .expectedArgsDouble = {0},
-        .expectedResult = 2,  },
+        .expectedResult = 2,
+        .expectedError = TINYCLI_ERROR_SUCCESS,
+    },
 
     {   .testname = "Double Function",
         .inputStr = "d 1.3\r",
@@ -88,7 +106,9 @@ testcase tests[] = {
         .expectedArgsInt = {0},
         .expectedArgsStr = {""},
         .expectedArgsDouble = {1.3},
-        .expectedResult = 3,  },
+        .expectedResult = 3,
+        .expectedError = TINYCLI_ERROR_SUCCESS,
+    },
 
     {   .testname = "Int,Int Function",
         .inputStr = "ii 12 -5\r",
@@ -96,7 +116,9 @@ testcase tests[] = {
         .expectedArgsInt = {12, -5},
         .expectedArgsStr = {""},
         .expectedArgsDouble = {0},
-        .expectedResult = 4,  },
+        .expectedResult = 4,
+        .expectedError = TINYCLI_ERROR_SUCCESS,
+    },
 
     {   .testname = "Int,Double Function",
         .inputStr = "id 12 -0.123\r",
@@ -104,7 +126,9 @@ testcase tests[] = {
         .expectedArgsInt = {12},
         .expectedArgsStr = {""},
         .expectedArgsDouble = {0, -0.123},
-        .expectedResult = 5,  },
+        .expectedResult = 5,
+        .expectedError = TINYCLI_ERROR_SUCCESS,
+    },
 
     {   .testname = "Double,Int Function",
         .inputStr = "di 123.0 12\r",
@@ -112,7 +136,9 @@ testcase tests[] = {
         .expectedArgsInt = {0,12},
         .expectedArgsStr = {""},
         .expectedArgsDouble = {123.0},
-        .expectedResult = 6,  },
+        .expectedResult = 6,
+        .expectedError = TINYCLI_ERROR_SUCCESS,
+    },
 
     {   .testname = "Double,Double Function",
         .inputStr = "dd 123.0 0.12\r",
@@ -120,7 +146,9 @@ testcase tests[] = {
         .expectedArgsInt = {0},
         .expectedArgsStr = {""},
         .expectedArgsDouble = {123.0, 0.12},
-        .expectedResult = 7,  },
+        .expectedResult = 7,
+        .expectedError = TINYCLI_ERROR_SUCCESS,
+    },
 
     {   .testname = "String Function",
         .inputStr = "s helloworld\r",
@@ -128,7 +156,9 @@ testcase tests[] = {
         .expectedArgsInt = {0},
         .expectedArgsStr = {"helloworld"},
         .expectedArgsDouble = {0},
-        .expectedResult = 8,  },
+        .expectedResult = 8,
+        .expectedError = TINYCLI_ERROR_SUCCESS,
+    },
 
     {   .testname = "No Command",
         .inputStr = "\r",
@@ -136,7 +166,10 @@ testcase tests[] = {
         .expectedArgsInt = {0},
         .expectedArgsStr = {""},
         .expectedArgsDouble = {0},
-        .expectedResult = TINYCLI_ERROR_NOCALL,  },
+        .expectedResult = 0,
+        .expectedError = TINYCLI_ERROR_NOCALL,
+    },
+
 
     {   .testname = "Max Args",
         .inputStr = "iiiiiiiiii 1 2 3 4 5 6 7 8 9 10\r",
@@ -144,6 +177,8 @@ testcase tests[] = {
         .expectedArgsInt = {1,2,3,4,5,6,7,8,9,10},
         .expectedArgsStr = {""},
         .expectedArgsDouble = {0},
-        .expectedResult = 0,  },
+        .expectedResult = 0,
+        .expectedError = TINYCLI_ERROR_SUCCESS,
+    },
 };
 

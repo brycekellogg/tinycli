@@ -41,6 +41,7 @@ typedef struct {
     char   expectedArgsStr[TINYCLI_MAXARGS][TINYCLI_MAXBUFFER];
     double expectedArgsDouble[TINYCLI_MAXARGS];
     int    expectedResult;
+    int    expectedError;
 } testcase;
 
 
@@ -84,11 +85,13 @@ void runTest(testcase t) {
     memset(argsDouble, 0, TINYCLI_MAXARGS*sizeof(double));
     memset(argsStr,    0, TINYCLI_MAXARGS*TINYCLI_MAXBUFFER*sizeof(char));
     memset(echoStr,    0, TINYCLI_MAXBUFFER*sizeof(char));
+    tinycli_result = 0;
     echoTop = 0;
 
     tinycli_putsn(t.inputStr, strlen(t.inputStr));
 
     munit_assert_int(tinycli_result, ==, t.expectedResult);
+    munit_assert_int(tinycli_error, ==, t.expectedError);
     munit_assert_memory_equal(TINYCLI_MAXARGS, argsInt, t.expectedArgsInt);
     munit_assert_memory_equal(TINYCLI_MAXARGS, argsDouble, t.expectedArgsDouble);
     munit_assert_memory_equal(TINYCLI_MAXARGS*TINYCLI_MAXBUFFER, argsStr, t.expectedArgsStr);
@@ -101,6 +104,7 @@ int main() {
     for (int i = 0; i < sizeof(tests)/sizeof(testcase); i++) {
         testcase t = tests[i];
         printf("Test: %s ... ", t.testname);
+        fflush(stdout);
         runTest(t);
         printf("PASS\n");
     }
