@@ -160,6 +160,7 @@
  * Tinycli will only generate negative error codes, positive
  * error codes are recommended for registered user functions.  */
 int tinycli_result;
+int tinycli_error;
 
 
 /* Declare functions
@@ -277,18 +278,26 @@ const char* tinycli_stos(const char* c) {
  *          or if the arguments converted incorrectedly.
  */
 int tinycli_call(int argc, char* argv[]) {
+    tinycli_error = TINYCLI_ERROR_SUCCESS;
     /* Skip calls that have no commands */
     if (argc < 1) {
+        tinycli_error = TINYCLI_ERROR_NOCALL;
         return TINYCLI_ERROR_NOCALL;
     }
 
-    #define tinycli_register(txt, fun, ...) \
-    if (!strcmp(argv[0], txt)) {            \
-        return (argc == 1+tinycli_nargs(__VA_ARGS__)) ? fun(tinycli_args(__VA_ARGS__)) : TINYCLI_ERROR_NUMARGS; \
+#define tinycli_register(txt, fun, ...)               \
+    if (!strcmp(argv[0], txt)) {                      \
+        if (argc == 1 + tinycli_nargs(__VA_ARGS__)) { \
+            return fun(tinycli_args(__VA_ARGS__));    \
+        } else {                                      \
+            tinycli_error = TINYCLI_ERROR_NUMARGS;    \
+            return TINYCLI_ERROR_NUMARGS;             \
+        }                                             \
     }
     #include "tinycli-funs.h"
     #undef tinycli_register
 
+    tinycli_error = TINYCLI_ERROR_NOCMD;
     return TINYCLI_ERROR_NOCMD;
 }
 

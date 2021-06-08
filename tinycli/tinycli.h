@@ -166,6 +166,7 @@ void tinycli_echos(char* s);
  *
  * TINYCLI_ERROR_NOCALL  = no command string was passed to tinycli
  ***************/
+#define TINYCLI_ERROR_SUCCESS   0
 #define TINYCLI_ERROR_NOCMD     -1
 #define TINYCLI_ERROR_NUMARGS   -2
 #define TINYCLI_ERROR_NOCALL    -3
@@ -175,6 +176,7 @@ void tinycli_echos(char* s);
  * Tinycli will only generate negative error codes, positive
  * error codes are recommended for registered user functions.  */
 extern int tinycli_result;
+extern int tinycli_error;
 
 
 /* Functions for passing text to Tinycli. This can be done either
