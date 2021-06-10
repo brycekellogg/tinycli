@@ -17,10 +17,11 @@ extern "C" {
 
 
 /* Feature enable flags. These defines enable various features such as
- * echoing and command editing. To enable them, either uncomment the line
+ * echo, command editing, and history. To enable them, either uncomment the line
  * corresponding to the desired feature or define the macro via the compler. */
 //#define TINYCLI_ENABLE_ECHO
 //#define TINYCLI_ENABLE_EDITING
+//#define TINYCLI_ENABLE_HISTORY
 
 
 /* Configure the maximum number of arguments supported. This controls
@@ -40,6 +41,13 @@ extern "C" {
 #define TINYCLI_MAXBUFFER  100
 #endif
 
+
+/* Configure the number of history slots to use when TINCLI_ENABLE_HISTORY is
+ * defined. Each slot will be the same size as defined in TINYCLI_MAXBUFFER.
+ * Any historical command that precedes this limit will be forgotten.  */
+#ifndef TINYCLI_MAXHISTORY
+#define TINYCLI_MAXHISTORY 5
+#endif
 
 /* Configure the character that signifies the end of a command.
  * In most systems this will be either a carriage return or a
@@ -78,6 +86,7 @@ extern "C" {
 #define TINYCLI_BACKSPACE "\x7f"
 #endif
 
+
 /* Configure the character that signifies a delete.
  * Specifically, receiving this character will delete
  * the entry in the buffer at the index of the current
@@ -85,21 +94,6 @@ extern "C" {
  * be reconfigured as needed.  */
 #ifndef TINYCLI_DEL
 #define TINYCLI_DEL "\x1B[3~"
-#endif
-
-/* Functions used by tinycli to echo characters back to the
- * terminal. If echoing is enabled, these functions need to
- * be implemented for your specific platform. Often they can
- * be written as wrappers around putchar and puts.
- *
- * tinycli_echoc(c) takes a single char
- * tinycli_echos(s) takes a null terminated string */
-#if defined(TINYCLI_ENABLE_ECHO)
-void tinycli_echoc(char c);
-void tinycli_echos(char* s);
-#else
-#define tinycli_echoc(c)
-#define tinycli_echos(s)
 #endif
 
 
@@ -176,6 +170,7 @@ void tinycli_echos(char* s);
 #define TINYCLI_ERROR_NUMARGS   -2
 #define TINYCLI_ERROR_NOCALL    -3
 
+
 /* Stores the result of a registered function when a command is
  * called or a negative error code as described above. Because
  * Tinycli will only generate negative error codes, positive
@@ -195,6 +190,23 @@ extern int tinycli_error;
  * registered functions may be long running.  */
 void tinycli_putsn(char* s, int n);
 void tinycli_putc(char c);
+
+
+/* Functions used by tinycli to echo characters back to the
+ * terminal. If echoing is enabled, these functions need to
+ * be implemented for your specific platform. Often they can
+ * be written as wrappers around putchar and puts.
+ *
+ * tinycli_echoc(c) takes a single char
+ * tinycli_echos(s) takes a null terminated string */
+#if defined(TINYCLI_ENABLE_ECHO)
+void tinycli_echoc(char c);
+void tinycli_echos(char* s);
+#else
+#define tinycli_echoc(c)
+#define tinycli_echos(s)
+#endif
+
 
 #ifdef __cplusplus
 }

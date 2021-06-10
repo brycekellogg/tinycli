@@ -313,8 +313,8 @@ void tinycli_call(int argc, char* argv[]) {
 /* Add char to tinycli buffer & potentially trigger command.
  *
  * Unless the input char `c` matches one of the special characters described
- * below, it is appended to a command buffer. This command buffer is then
- * compared against the command string specified in `tinycli_register()`
+ * below, it is appended to a command buffer. This command buffer is compared
+ * against command strings specified in `tinycli_register()` on TINYCLI_ENTER
  *
  * TINYCLI_ENTER: indicates that an enter or return code has been sent and
  *                that this is the end of a command string. Tinycli will
@@ -339,6 +339,10 @@ void tinycli_call(int argc, char* argv[]) {
  *                     command string buffer is updated accordingly. This is
  *                     only used if TINYCLI_ENABLE_EDITING is enabled.
  *
+ * TiNYCLI_UPARROW
+ * TINYCLI_DOWNARROW: controlls scrolling through the command history. Up goes
+ *                    back in the history and down advances forward. Only used
+ *                    if TINYCLI_ENABLE_HISTORY is defined.
  * Params:
  *     c = the character to append
  */
@@ -350,11 +354,98 @@ void tinycli_putc(char c) {
     static char*  argv[TINYCLI_MAXARGS+1];
     int argc;
 
+#ifdef TINYCLI_ENABLE_HISTORY
+    static int  histCur = 0;
+    static int  histTop = 0;
+    static char history[TINYCLI_MAXHISTORY][TINYCLI_MAXBUFFER];
+#endif  // TINYCLI_ENABLE_HISTORY
+
 
     // Ignore any characters in the TINYCLI_SKIPCHARS macro
     for (int i = 0; i < sizeof(TINYCLI_SKIPCHARS); i++) {
         if (c == TINYCLI_SKIPCHARS[i]) return;
     }
+
+#ifdef TINYCLI_ENABLE_HISTORY
+
+    // Test if we have matched the escape sequence for a up arrow key code.
+    // If so, we save the command buffer into the current history slot, advance
+    // the current history slot back in time one step, and replace the command
+    // buffer with the contents of that history slot.
+    static int escCntUp = 0;
+    if (escCntUp < sizeof(TINYCLI_UPARROW) && c != TINYCLI_UPARROW[escCntUp]) escCntUp = 0;
+    if (escCntUp < sizeof(TINYCLI_UPARROW) && c == TINYCLI_UPARROW[escCntUp]) escCntUp++;
+    if (escCntUp == sizeof(TINYCLI_UPARROW)-1) {
+        escCntUp = 0;
+
+        // If we've reached the end of the
+        // history, we don't want to advance.
+        if (histCur >= histTop) return;
+
+        // Save the command buffer in the current
+        // history slot and swap it out for the
+        // command sitting in the new history slot.
+        strcpy(history[histCur], buffer);
+        histCur++;
+        strcpy(buffer, history[histCur]);
+
+        // Erase the full current line and rewrite
+        // the buffer so that we see the new command.
+        for (int i = top-1; i >= 0; i--) tinycli_echos(TINYCLI_CURSORBACKWARD);
+        for (int i = top-1; i >= 0; i--) tinycli_echoc(' ');
+        for (int i = top-1; i >= 0; i--) tinycli_echos(TINYCLI_CURSORBACKWARD);
+        tinycli_echos(buffer);
+
+        // Update the pointers to the cursor
+        // and top of the buffer. Note that
+        // whenever we use history, the cursor
+        // always returns to the end of the line.
+        top = cur = strlen(buffer);
+
+        // No further processing
+        return;
+    }
+
+    // Test if we have matched the escape sequence for a down arrow key code.
+    // If so, we save the command buffer into the current history slow, advance
+    // the current history slot forward in time one time step, and replace the
+    // command buffer with the contents of that history slot.
+    static int escCntDown = 0;
+    if (escCntDown < sizeof(TINYCLI_DOWNARROW) && c != TINYCLI_DOWNARROW[escCntDown]) escCntDown = 0;
+    if (escCntDown < sizeof(TINYCLI_DOWNARROW) && c == TINYCLI_DOWNARROW[escCntDown]) escCntDown++;
+    if (escCntDown == sizeof(TINYCLI_DOWNARROW)-1) {
+        escCntDown = 0;
+
+        // If we've reached the most
+        // recent history slot, we don't
+        // want to advance forward.
+        if (histCur <= 0) return;
+
+        // Save the command buffer in the current
+        // history slot and swap it out for the
+        // command sitting in the new history slot.
+        strcpy(history[histCur], buffer);
+        histCur--;
+        strcpy(buffer, history[histCur]);
+
+        // Erase the full current line and rewrite
+        // the buffer so that we see the new command.
+        for (int i = top-1; i >= 0; i--) tinycli_echos(TINYCLI_CURSORBACKWARD);
+        for (int i = top-1; i >= 0; i--) tinycli_echoc(' ');
+        for (int i = top-1; i >= 0; i--) tinycli_echos(TINYCLI_CURSORBACKWARD);
+        tinycli_echos(buffer);
+
+        // Update the pointers to the cursor
+        // and top of the buffer. Note that
+        // whenever we use history, the cursor
+        // always returns to the end of the line.
+        top = cur = strlen(buffer);
+
+        // No further processing
+        return;
+    }
+
+#endif  // TINYCLI_ENABLE_HISTORY
 
 
 #ifdef TINYCLI_ENABLE_EDITING
@@ -465,8 +556,32 @@ void tinycli_putc(char c) {
         cur = 0;
         tinycli_echos("\r\n");  // Echo to complete line
 
+#ifdef TINYCLI_ENABLE_HISTORY
+
+        // Test if a command (correct or not) was actually entered.
+        // We don't want to save empty commands to the history.
+        if (tinycli_error != TINYCLI_ERROR_NOCALL) {
+
+            // Reset the history counters/index so that
+            // we always start history from the latest
+            // after a command is entered and so that
+            // we don't try to scroll past the first
+            // command that was entered.
+            histCur = 0;
+            if (histTop < TINYCLI_MAXHISTORY-1) histTop++;
+
+            // Shift the histry slots by one and save
+            // the command buffer into the most recent.
+            for (int i = histTop; i > 0; i--) strcpy(history[i], history[i-1]);
+            strcpy(history[1], buffer);
+        }
+
+#endif  // TINYCLI_ENABLE_HISTORY
+
         argc = tinycli_tokenize(buffer, argv);      // Parse command into argv and argc
         tinycli_call(argc, argv);  // Try to call function
+        buffer[top] = '\0';     // Clear buffer
+
     } else if(top < TINYCLI_MAXBUFFER - 1){
         // Insert character by shifting buffer right one,
         // and saving char to the newly open index.
