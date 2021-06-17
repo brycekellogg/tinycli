@@ -309,6 +309,27 @@ void tinycli_call(int argc, char* argv[]) {
 }
 
 
+#if defined(TINYCLI_ENABLE_HISTORY)
+/* Variables for tracking the currently selected history
+ * item and the top most history item. These are used to
+ * make sure that we don't allow users to scroll back
+ * beyond the actual history when only a few commands
+ * have been entered as well as to keep track of which
+ * history slot is currently being selected/displayed.  */
+static int  histCur = 0;
+static int  histTop = 0;
+
+/* Clear the tinycli history buffer.
+ *
+ * Clearing the history buffer consists of resetting the
+ * pointers to the top and current commands in the history
+ * stack. We don't actually clear out the buffer contents.  */
+void tinycli_clearhistory() {
+    histTop = 0;
+    histCur = 0;
+}
+#endif  // TINYCLI_ENABLE_HISTORY
+
 
 /* Add char to tinycli buffer & potentially trigger command.
  *
@@ -355,8 +376,6 @@ void tinycli_putc(char c) {
     int argc;
 
 #ifdef TINYCLI_ENABLE_HISTORY
-    static int  histCur = 0;
-    static int  histTop = 0;
     static char history[TINYCLI_MAXHISTORY][TINYCLI_MAXBUFFER];
 #endif  // TINYCLI_ENABLE_HISTORY
 

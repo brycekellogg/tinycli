@@ -208,6 +208,16 @@ void tinycli_echos(char* s);
 #endif
 
 
+/* Function for clearing tinycli history of past commands.
+ * If history is enabled, we save each command into a history
+ * stack for future use. This function allows clearing all
+ * previous history from the stack. Tinycli will be as if
+ * from a clean boot state.  */
+#if defined(TINYCLI_ENABLE_HISTORY)
+void tinycli_clearhistory();
+#endif
+
+
 #ifdef __cplusplus
 }
 #endif
