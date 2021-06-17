@@ -58,7 +58,7 @@ typedef struct {
 int    argsInt[TINYCLI_MAXARGS];
 char   argsStr[TINYCLI_MAXARGS][TINYCLI_MAXBUFFER];
 double argsDouble[TINYCLI_MAXARGS];
-char   echoStr[TINYCLI_MAXBUFFER];
+char   echoStr[TINYCLI_MAXBUFFER*100]; // echoing can be much larger than buffer
 int    echoTop;
 
 
@@ -86,7 +86,13 @@ void runTest(testcase t) {
     memset(argsStr,    0, TINYCLI_MAXARGS*TINYCLI_MAXBUFFER*sizeof(char));
     memset(echoStr,    0, TINYCLI_MAXBUFFER*sizeof(char));
     tinycli_result = 0;
+    tinycli_error = 1;
     echoTop = 0;
+
+#ifdef TINYCLI_ENABLE_HISTORY
+    // Clear history before each test
+    tinycli_clearhistory();
+#endif
 
     tinycli_putsn(t.inputStr, strlen(t.inputStr));
 

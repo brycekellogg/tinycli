@@ -92,3 +92,12 @@ int f_iiiiiiiiiii(int arg0, int arg1, int arg2, int arg3, int arg4,
     return 0;
 }
 
+int f_h0(void) {
+    return 1;
+}
+int f_h1(void) {
+    return 2;
+}
+int f_h2(void) {
+    return 3;
+}
