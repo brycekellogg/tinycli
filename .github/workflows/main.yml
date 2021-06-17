@@ -1,8 +1,8 @@
 name: CI
 
 on:
-  push:         {branches: [ master ]}
-  pull_request: {branches: [ master ]}
+  push:         {branches: [ feature/ci ]}
+  pull_request: {branches: [ feature/ci ]}
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
