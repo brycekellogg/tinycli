@@ -577,8 +577,21 @@ void tinycli_putc(char c) {
 
 #ifdef TINYCLI_ENABLE_HISTORY
 
+        // We save the buffer to history before we call the command
+        // because tokenization inserts NULL chars to create the
+        // strings in argv. If this were done after, the history
+        // would not save the arguments to commands.
+        strcpy(history[0], buffer);
+#endif  // TINYCLI_ENABLE_HISTORY
+
+        argc = tinycli_tokenize(buffer, argv);      // Parse command into argv and argc
+        tinycli_call(argc, argv);  // Try to call function
+
+#ifdef TINYCLI_ENABLE_HISTORY
+
         // Test if a command (correct or not) was actually entered.
-        // We don't want to save empty commands to the history.
+        // We don't want to save empty commands to the history. This
+        // needs to happen after we call the command (to get error).
         if (tinycli_error != TINYCLI_ERROR_NOCALL) {
 
             // Reset the history counters/index so that
@@ -589,16 +602,13 @@ void tinycli_putc(char c) {
             histCur = 0;
             if (histTop < TINYCLI_MAXHISTORY-1) histTop++;
 
-            // Shift the histry slots by one and save
-            // the command buffer into the most recent.
+            // Shift the history slots by one. The command buffer
+            // was already saved into the most recent history slot.
             for (int i = histTop; i > 0; i--) strcpy(history[i], history[i-1]);
-            strcpy(history[1], buffer);
         }
 
 #endif  // TINYCLI_ENABLE_HISTORY
 
-        argc = tinycli_tokenize(buffer, argv);      // Parse command into argv and argc
-        tinycli_call(argc, argv);  // Try to call function
         buffer[top] = '\0';     // Clear buffer
 
     } else if(top < TINYCLI_MAXBUFFER - 1){
