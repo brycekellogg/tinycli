@@ -1,19 +1,20 @@
 # Tinycli
-
-Tinycli is a small C library for providing a simple command line interface
+Tinycli is a C library for providing a simple command line interface
 for resource constrained embedded systems. The library is designed to be small,
 lightweight, and extremely portable while still containing a useful feature
-set for interacting with microcontrollers via a terminal interface.
+set. It can be used for interacting with microcontrollers via a serial
+interface or for embedding in a larger program to provide a simple terminal.
+
 
 ## Usage
+Tinycli provides a simple terminal interface by exposing a set of user defined
+"commands". These commands provide a mapping from text strings to C functions
+such that the corresponding function is called when a command string is entered.
+Additionally, features such as argument type conversion, character echo,
+command editing, and history are handled by the Tinycli library.
 
-Commands in Tinycli are statically declared at compile time via the tinycli-funs.h
-header file. Each command consists of a command string, a function name,
-and a list of function parameter types. After commands are declared at compile
-time, text can be passed to the tinycli library to be compared against the
-registered command strings. In the case of a match, string arguments will
-be converted to the appropriate types and the registered function will be
-called.
+Specifics on performing each of these steps are given below and working code
+examples can be found in the [examples direcory](/examples/)
 
 
 ### Registering a command
@@ -32,21 +33,19 @@ declare at least 1 parameter type; in the case of a function that takes no
 parameters void must be used. The table below shows the currently
 supported parameter types.
 
-| Type        | Code | Example |
-|-------------|------|---------|
-| `void`      | `v`  |         |
-| `int`       | `i`  | 12      |
-| `double`    | `d`  | 3.14    |
-| `char*`     | `s`  | hello   |
-| `long long` | `ll` | 9999999 |
+| Type        | Descriptor | Example |
+|-------------|------------|---------|
+| `void`      | `v`        |         |
+| `int`       | `i`        | 12      |
+| `double`    | `d`        | 3.14    |
+| `char*`     | `s`        | hello   |
+| `long long` | `ll`       | 9999999 |
 
 As an example, suppose we want to register the function shown below to be
 called via the command "doSomething". It takes two parameters (an integer and a
 character pointer) which would correspond to the tinycli type descriptors `i`
 and `s`. Note that the return type of all registered functions must be `int` to
 allow passing of error codes from the registered function to the tinycli library.
-It is recommended that the registered function use zero for success and a
-positive return value for failure.
 
 ```C
 int some_function(int a, char* str) { ... }
@@ -75,7 +74,7 @@ void tinycli_putc(char c);
 These functions allow you to pass text to Tinycli either a character at a time
 or via entire strings. Generally these functions are called after receiving
 UART input via an interrupt routine. If the terminal emulator (picocom, putty,
-etc) is using a local echo feature, it is gnerally recommended that you use the
+etc) is using a local echo feature, it is generally recommended that you use the
 `tinycli_putsn` function for passing text. If not using local echo, `tinycli_putc`
 is a better choice as it allows Tinycli to echo characters back as they are typed.
 
@@ -83,21 +82,52 @@ As text input is passed to the Tinycli library, it saves the text in an internal
 text buffer until the library receives a `TINYCLI_ENTER` character. This configurable
 character triggers the library's processing step, where it iterates over the
 registered commands and compares each one with the first word (separated by
-whitespace) of the entered text. If a match is found, the arguments will be
+`TINYCLI_TOKDELIM`) of the entered text. If a match is found, the arguments will be
 converted to the correct types, and the corresponding function will be called.
 Placing calls to these functions in interrupts is currently discouraged because
 they may launch long running functions (depending on the functions registered).
 
 ### Checking Results
-Tinycli stores the result of operations and user functions in the variable
-`tinycli_result`. The library itself will only ever return negative error
-codes, so positive return codes can be reserved for user functions. Note that
-all user functions must have return type `int` and therefore return some
-sort of status code. The error codes returned by the tinycli library can
-be found in `tinycli.h`.
+The global variables `tinycli_error` and `tinycli_result` can be used to
+check the status of a Tinycli operation and to retrieve the integer result
+of the user defined function. If a command was successfully run
+(from Tinycli's point of view) then `tinycli_error` will be set to
+`TINYCLI_ERROR_SUCCESS`. If something went wrong (command not found, wrong
+number of arguments, etc) then `tinycli_error` will be set to one of the
+error codes defined in `tinycli.h`. If a user defined function ends up being
+called, the return value of the function will be saved in `tinycli-result`.
+The value of this variable is only valid if
+`tinycli_error == TINYCLI_ERROR_SUCCESS`.
+
+### Echoing Text
+Echo is enabled by defining `TINYCLI_ENABLE_ECHO` and providing implementations
+of `tinycli_echoc(char c)` and `tinycli_echos(char* s)`. Usually these helper
+functions end up sending characters over UART or calling standard `putchar`/
+`fputs` functions (see examples). With echo enabled, Tinycli will print out
+commands as they are typed and correctly erase and re-print lines as commands
+are edited or history is browsed (if editing/history are enabled).
+
+### Command Editing
+Command editing is enabled by defining `TINYCLI_ENABLE_EDITING`. Once enabled,
+this allows the user to use the arrow keys, backspace, and delete to edit
+commands that have not yet been completed. The ASCII codes corresponding to
+the editing commands are defined in `tinycli.h` and can customized to fit
+the terminal being used.
+
+### Command History
+Command history is enabled by defining `TINYCLI_ENABLE_HISTORY`. Once enabled,
+past commands (up to a configurable limit) are saved in a command history fifo.
+These historical commands can be browsed and executed similar to a traditional
+terminal using the up/down arrow keys. The ASCII codes corresponging to the
+history browsing keys ared defined in `tinycli.h` and can be customized to fit
+the terminal being used.
+
 
 ## Configuring TinyCli
-
+Tinycli supports various configuration options that allow customizing the
+supported features, amount of required resources, and specific control
+characters. Configuration options defaults are set in `tinycli.h` and can
+be overridden by defining macros via the compiler arguments.
 
 
 
