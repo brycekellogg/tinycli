@@ -26,7 +26,7 @@ testcase tests[] = {
         .expectedArgsInt = {0},
         .expectedArgsStr = {""},
         .expectedArgsDouble = {0},
-        .expectedResult = 0,
+        .expectedResult = TINYCLI_RESULT_NONE,
         .expectedError = TINYCLI_ERROR_NUMARGS,
     },
 
@@ -166,7 +166,7 @@ testcase tests[] = {
         .expectedArgsInt = {0},
         .expectedArgsStr = {""},
         .expectedArgsDouble = {0},
-        .expectedResult = 0,
+        .expectedResult = TINYCLI_RESULT_NONE,
         .expectedError = TINYCLI_ERROR_NOCALL,
     },
 

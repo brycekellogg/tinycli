@@ -85,8 +85,6 @@ void runTest(testcase t) {
     memset(argsDouble, 0, TINYCLI_MAXARGS*sizeof(double));
     memset(argsStr,    0, TINYCLI_MAXARGS*TINYCLI_MAXBUFFER*sizeof(char));
     memset(echoStr,    0, TINYCLI_MAXBUFFER*sizeof(char));
-    tinycli_result = 0;
-    tinycli_error = 1;
     echoTop = 0;
 
 #ifdef TINYCLI_ENABLE_HISTORY
@@ -96,8 +94,8 @@ void runTest(testcase t) {
 
     tinycli_putsn(t.inputStr, strlen(t.inputStr));
 
-    munit_assert_int(tinycli_result, ==, t.expectedResult);
-    munit_assert_int(tinycli_error, ==, t.expectedError);
+    munit_assert_int(tinycli_result(), ==, t.expectedResult);
+    munit_assert_int(tinycli_error(), ==, t.expectedError);
     munit_assert_memory_equal(TINYCLI_MAXARGS, argsInt, t.expectedArgsInt);
     munit_assert_memory_equal(TINYCLI_MAXARGS, argsDouble, t.expectedArgsDouble);
     munit_assert_memory_equal(TINYCLI_MAXARGS*TINYCLI_MAXBUFFER, argsStr, t.expectedArgsStr);

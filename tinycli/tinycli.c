@@ -155,19 +155,37 @@
 #define tinycli_args(...) CONCAT(tinycli_args_,tinycli_nargs(__VA_ARGS__))(tinycli_nargs(__VA_ARGS__),tinycli_nargs(__VA_ARGS__),__VA_ARGS__)
 
 
-/* Stores the result of a registered function when a command is
- * called. Because all commands are required to return int, this
- * variable is guaranteed to hold the result of a command after it
- * is called. In the case of a tinycli error (command not found, etc)
- * this value will not change and will continue to hold the value
- * from the previous successfully run command.  */
-int tinycli_result;
+/* Local variables for storing user defined function results and
+ * for storing Tinycli results such as command not found, etc.  */
+static int tinycli_local_result = TINYCLI_RESULT_NONE;
+static int tinycli_local_error  = TINYCLI_ERROR_NONE;
 
 
-/* Stores error or result codes from the tinycli library itself.
- * Is used to signal when a command has been completed as well as
- * if there was an error processing a command.  */
-int tinycli_error;
+/* Function for retreiving an error or result codes from Tinycli
+ *
+ * When a command is executed, Tinycli will set an error code based
+ * on the status of how the command was executed. This is specifically
+ * for results related to Tinycli opertation such as:
+ *   - command not found
+ *   - incorrect number of args,
+ *   - etc.
+ */
+int tinycli_error() {
+    return tinycli_local_error;
+}
+
+
+/* Function for retrieving a result from a user defined function
+ *
+ * When a command is successully called, the resulting integer
+ * return value of the funciton can be retrieved using this
+ * function. If a command was not successfully called
+ * (tinycli_error() != TINYCLI_ERROR_SUCCESS) this should return
+ * TINYCLI_RESULT_NONE. The value of the default result code can
+ * be changed in tinycli.h.  */
+int tinycli_result() {
+    return tinycli_local_result;
+}
 
 
 /* Declare functions
@@ -288,24 +306,24 @@ void tinycli_call(int argc, char* argv[]) {
 
     /* Skip calls that have no commands */
     if (argc < 1) {
-        tinycli_error = TINYCLI_ERROR_NOCALL;
+        tinycli_local_error = TINYCLI_ERROR_NOCALL;
         return;
     }
 
 #define tinycli_register(txt, fun, ...)                       \
     if (!strcmp(argv[0], txt)) {                              \
         if (argc == 1 + tinycli_nargs(__VA_ARGS__)) {         \
-            tinycli_result = fun(tinycli_args(__VA_ARGS__));  \
-            tinycli_error = TINYCLI_ERROR_SUCCESS;            \
+            tinycli_local_result = fun(tinycli_args(__VA_ARGS__));  \
+            tinycli_local_error = TINYCLI_ERROR_SUCCESS;            \
         } else {                                              \
-            tinycli_error = TINYCLI_ERROR_NUMARGS;            \
+            tinycli_local_error = TINYCLI_ERROR_NUMARGS;            \
         }                                                     \
         return;                                               \
     }
     #include "tinycli-funs.h"
     #undef tinycli_register
 
-    tinycli_error = TINYCLI_ERROR_NOCMD;
+    tinycli_local_error = TINYCLI_ERROR_NOCMD;
 }
 
 
@@ -384,6 +402,12 @@ void tinycli_putc(char c) {
     for (int i = 0; i < sizeof(TINYCLI_SKIPCHARS); i++) {
         if (c == TINYCLI_SKIPCHARS[i]) return;
     }
+
+    // We reset the error variables so that they are set
+    // to a fixed value in the case where no command was
+    // called. This needs to happen after the SKIPCHARS.
+    tinycli_local_error  = TINYCLI_ERROR_NONE;
+    tinycli_local_result = TINYCLI_RESULT_NONE;
 
 #ifdef TINYCLI_ENABLE_HISTORY
 
@@ -592,7 +616,7 @@ void tinycli_putc(char c) {
         // Test if a command (correct or not) was actually entered.
         // We don't want to save empty commands to the history. This
         // needs to happen after we call the command (to get error).
-        if (tinycli_error != TINYCLI_ERROR_NOCALL) {
+        if (tinycli_local_error != TINYCLI_ERROR_NOCALL) {
 
             // Reset the history counters/index so that
             // we always start history from the latest

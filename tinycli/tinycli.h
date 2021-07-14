@@ -151,6 +151,10 @@ extern "C" {
  * global variable tinycli_error will be set with a negative
  * error code. Currently supported error codes are:
  *
+ * TINYCLI_ERROR_NONE    = inficates that a command has no been called
+ *                         at all. This is the value of tinycli_error()
+ *                         when entering text in between actual commands.
+ *
  * TINYCLI_ERROR_SUCCESS = indicates that a command was successfully
  *                         completed (from tinycli point of view). The
  *                         result of the command can now be checked
@@ -165,18 +169,29 @@ extern "C" {
  *
  * TINYCLI_ERROR_NOCALL  = no command string was passed to tinycli
  ***************/
+#define TINYCLI_ERROR_NONE       1
 #define TINYCLI_ERROR_SUCCESS    0
 #define TINYCLI_ERROR_NOCMD     -1
 #define TINYCLI_ERROR_NUMARGS   -2
 #define TINYCLI_ERROR_NOCALL    -3
 
+/* This is a result code used as a dummy result when
+ * a command has not yet been executed. This is the
+ * value tinycli_result() will return if tinycli_error()
+ * returns TINYCLI_ERROR_SUCCESS.  */
+#ifndef TINYCLI_RESULT_NONE
+#define TINYCLI_RESULT_NONE  1
+#endif
 
-/* Stores the result of a registered function when a command is
- * called or a negative error code as described above. Because
- * Tinycli will only generate negative error codes, positive
- * error codes are recommended for registered user functions.  */
-extern int tinycli_result;
-extern int tinycli_error;
+/* Functions that allow checking the result of a Tinycli operation
+ * or the resut of a registered function when a command is called.
+ * After receiving TINYCLI_ENTER to one of the Tinycli text passing
+ * functions, tinycli_error() will return one of the error codes
+ * defined above. If thinycli_error() returns TINYCLI_ERROR_SUCCESS,
+ * then tinycli_result will return the result of the most recently
+ * executed command.  */
+int tinycli_result();
+int tinycli_error();
 
 
 /* Functions for passing text to Tinycli. This can be done either
