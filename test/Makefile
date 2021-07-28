@@ -3,7 +3,8 @@ CC = gcc
 
 CFLAGS = --std=c99 \
 		 -Wall \
-		 -Wpedantic
+		 -Wpedantic \
+		 -Wno-vla-parameter
 
 INCDIRS = -I$(ROOT)/tinycli/ -I./ -I../
 
