@@ -61,6 +61,28 @@ intentional and required.
 tinycli_register("doSomething", some_fuinction, i, s)
 ```
 
+### Immediate Commands
+Special commands can be executed immediately upon entry of a single character.
+These immediate commands allow for functionality like CTRL-C detection by
+bypassing the normal Tinycli functionality (argument parsing, wait for ENTER,
+history, echo, etc) and instead executing a registered function immediately
+upon detecting the registered character.
+
+An immediate command is registered using a registration call in `tinycli-funs.h`
+of the form:
+```C
+tinycli_register_immediate('c', function_ptr)
+```
+or
+```C
+tinycli_register_immediate(0x03, function_ptr)
+```
+Functions for immediate commands must take no parameters and return an int. An
+immediate command will not be echoed or saved in the history. It is recommended
+to use non-ascii or special characters for immediate commands, because if they
+share a character with another command, the non-immediate command will never
+get executed.
+
 ### Passing text
 In order for Tinycli to process input text, evaulate potential matches, and
 call registered functions, text must be passed to the library using one of

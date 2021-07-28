@@ -193,8 +193,10 @@ int tinycli_result() {
  * This is here because we actually call the registered functions
  * from this file. Thus we need them declared in this file.  */
 #define tinycli_register(txt, fun, ...) int fun(tinycli_params(__VA_ARGS__));
+#define tinycli_register_immediate(txt, fun) int fun(void);
 #include "tinycli-funs.h"
 #undef tinycli_register
+#undef tinycli_register_immediate
 
 
 /*
@@ -320,8 +322,10 @@ void tinycli_call(int argc, char* argv[]) {
         }                                                     \
         return;                                               \
     }
-    #include "tinycli-funs.h"
-    #undef tinycli_register
+#define tinycli_register_immediate(txt, fun)
+#include "tinycli-funs.h"
+#undef tinycli_register
+#undef tinycli_register_immediate
 
     tinycli_local_error = TINYCLI_ERROR_NOCMD;
 }
@@ -402,6 +406,22 @@ void tinycli_putc(char c) {
     for (int i = 0; i < sizeof(TINYCLI_SKIPCHARS); i++) {
         if (c == TINYCLI_SKIPCHARS[i]) return;
     }
+
+    // Check if the current character corresponds to one of
+    // the registered immediate commands. If there are no
+    // registered immediate commands, nothing happens. If
+    // it does match an immediate command, the command gets
+    // executed, results set, and we immediately return.
+#define tinycli_register(txt, fun, ...)
+#define tinycli_register_immediate(txt, fun) \
+    if (txt == c) {  \
+        tinycli_local_result = fun();  \
+        tinycli_local_error = TINYCLI_ERROR_SUCCESS;  \
+        return;  \
+    }
+#include "tinycli-funs.h"
+#undef tinycli_register
+#undef tinycli_register_immediate
 
     // We reset the error variables so that they are set
     // to a fixed value in the case where no command was

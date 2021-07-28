@@ -51,11 +51,25 @@ CFLAGS-history=-DTINYCLI_ENABLE_EDITING \
 			   -DTINYCLI_CURSORBACKWARD="\"<\"" \
 			   -DTEST_HEADER='"./testcases-history.h"'
 
+CFLAGS-immediate=-DTINYCLI_ENABLE_EDITING \
+	             -DTINYCLI_ENABLE_ECHO \
+				 -DTINYCLI_ENABLE_HISTORY \
+				 -DTINYCLI_BACKSPACE="\"\b\"" \
+				 -DTINYCLI_DEL="\"~\"" \
+				 -DTINYCLI_LEFTARROW="\"<\"" \
+				 -DTINYCLI_RIGHTARROW="\">\"" \
+				 -DTINYCLI_UPARROW="\"^\"" \
+				 -DTINYCLI_DOWNARROW="\"|\"" \
+				 -DTINYCLI_CURSORFORWARD="\">\"" \
+				 -DTINYCLI_CURSORBACKWARD="\"<\"" \
+				 -DTEST_HEADER='"./testcases-immediate.h"'
+
 all: test-noecho-noedit \
 	 test-echo-noedit \
 	 test-echo-edit \
 	 test-noecho-edit \
-	 test-history
+	 test-history \
+	 test-immediate
 
 test-noecho-noedit: $(SOURCES) $(HEADERS)
 	@$(CC) $(CFLAGS) $(CFLAGS-noecho-noedit) $(INCDIRS) $(SOURCES) -o test
@@ -75,6 +89,10 @@ test-noecho-edit: $(SOURCES) $(HEADERS)
 
 test-history: $(SOURCES) $(HEADERS)
 	@$(CC) $(CFLAGS) $(CFLAGS-history) $(INCDIRS) $(SOURCES) -o test
+	@./test
+
+test-immediate: $(SOURCES) $(HEADERS)
+	@$(CC) $(CFLAGS) $(CFLAGS-immediate) $(INCDIRS) $(SOURCES) -o test
 	@./test
 
 clean:

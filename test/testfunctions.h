@@ -101,3 +101,12 @@ int f_h1(void) {
 int f_h2(void) {
     return 3;
 }
+
+int f_im0(void) {
+    return 1;
+}
+
+int f_im1(void) {
+    return 2;
+}
+
