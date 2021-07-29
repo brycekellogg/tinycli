@@ -216,11 +216,48 @@ int tinycli_result() {
  *   In the case that str contains more tokens than MAX_ARGC, then only
  *   the first MAX_ARGC number will be copied into argv.
  */
+#define DELIM   1
+#define TEXT    2
+#define QUOTE   3
 int tinycli_tokenize(char* str, char* argv[]) {
     int argc = 0;
-    argv[argc] = strtok(str, TINYCLI_TOKDELIM);
-    if (argv[argc] == NULL) return 0;
-    while (++argc <= TINYCLI_MAXARGS && (argv[argc] = strtok(NULL, TINYCLI_TOKDELIM)));
+    int state = DELIM;
+
+    while (*str) {
+        switch (state) {
+            case DELIM: {
+                if (*str == ' ') {
+                    *str = '\0';
+                } else if (*str == '\"') {
+                    argv[argc++] = str+1;
+                    state = QUOTE;
+                } else {
+                    argv[argc++] = str;
+                    state = TEXT;
+                }
+                break;
+            }
+
+            case TEXT: {
+                if (*str == ' ') {
+                    *str = '\0';
+                    state = DELIM;
+                }
+                break;
+            }
+
+            case QUOTE: {
+                if (*str == '\"') {
+                    *str = '\0';
+                    state = TEXT;
+                }
+                break;
+            }
+        }
+
+        str++;
+    }
+
     return argc;
 }
 
