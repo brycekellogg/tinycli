@@ -223,39 +223,63 @@ int tinycli_tokenize(char* str, char* argv[]) {
     int argc = 0;
     int state = DELIM;
 
-    while (*str) {
+    for (; *str != '\0'; str++) {
         switch (state) {
+
+            // In this parse state, we are processing delimiter
+            // characters and waiting for a non-delimiter character.
+            // A non-delimiter character indicates the start of the
+            // command or an argument.
             case DELIM: {
-                if (*str == ' ') {
+                if (*str == TINYCLI_TOKDELIM) {
                     *str = '\0';
-                } else if (*str == '\"') {
-                    argv[argc++] = str+1;
-                    state = QUOTE;
-                } else {
-                    argv[argc++] = str;
-                    state = TEXT;
+                    continue;
                 }
-                break;
+
+#ifdef TINYCLI_ENABLE_QUOTE
+                if (*str == TINYCLI_TOKQUOTE) {
+                    if (argc <= TINYCLI_MAXARGS) argv[argc++] = str+1;
+                    state = QUOTE;
+                    continue;
+                }
+#endif // TINCLI_ENABLE_QUOTE
+
+                if (argc <= TINYCLI_MAXARGS) argv[argc++] = str;
+                state = TEXT;
+                continue;
             }
 
+            // In this parse state, we are processing non-quoted
+            // text of either a command or an argument. We're
+            // basically just waiting for another delimiter character
+            // to finish this command/argument and transition back
+            // to the delimiter processing state.
             case TEXT: {
-                if (*str == ' ') {
+                if (*str == TINYCLI_TOKDELIM) {
                     *str = '\0';
                     state = DELIM;
                 }
                 break;
             }
 
+            // In this parse state, we are processing quoted text
+            // of an argument. I suppose it could be used to support
+            // a command with spaces in it, but that would be silly.
+            // We wait for a closing quote character and then
+            // transition to the delimiter processing state. Note
+            // that because we transition to the delimiter state,
+            // we do not support weird cases with quotes embedded
+            // inside argument strings.
+#ifdef TINYCLI_ENABLE_QUOTE
             case QUOTE: {
-                if (*str == '\"') {
+                if (*str == TINYCLI_TOKQUOTE) {
                     *str = '\0';
-                    state = TEXT;
+                    state = DELIM;
                 }
                 break;
             }
+#endif // TINCLI_ENABLE_QUOTE
         }
-
-        str++;
     }
 
     return argc;
