@@ -22,6 +22,7 @@ extern "C" {
 //#define TINYCLI_ENABLE_ECHO
 //#define TINYCLI_ENABLE_EDITING
 //#define TINYCLI_ENABLE_HISTORY
+#define TINYCLI_ENABLE_QUOTE
 
 
 /* Configure the maximum number of arguments supported. This controls
@@ -73,7 +74,17 @@ extern "C" {
  * does not respect quoting of parameters, and splits based on this
  * delimiter no matter what.  */
 #ifndef TINYCLI_TOKDELIM
-#define TINYCLI_TOKDELIM  " "
+#define TINYCLI_TOKDELIM  ' '
+#endif
+
+
+/* Configure which character is used to quote arguments.
+ * This is a character that allows delimiter characters
+ * in arguments by indicating that all characters between
+ * a set of quote characters are always treated as argument
+ * characters, treating all delimiter characters as text.  */
+#ifndef TINYCLI_TOKQUOTE
+#define TINYCLI_TOKQUOTE  '"'
 #endif
 
 
